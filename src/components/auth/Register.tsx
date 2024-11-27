@@ -132,24 +132,6 @@ export const RegisterPage: React.FC<RegisterProps> = ({ providers, title }) => {
         requiredMark={false}
       >
         <Form.Item
-          name="name"
-          label={translate("pages.register.name", "Name")}
-          rules={[
-            {
-              required: true,
-              message: translate(
-                "pages.register.errors.requiredName",
-                "Name is required"
-              ),
-            },
-          ]}
-        >
-          <Input
-            size="large"
-            placeholder={translate("pages.register.fields.name", "Name")}
-          />
-        </Form.Item>
-        <Form.Item
           name="email"
           label={translate("pages.register.email", "Email")}
           rules={[
