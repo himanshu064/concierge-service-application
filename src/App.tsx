@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 
 import { ErrorComponent, useNotificationProvider } from "@refinedev/antd";
@@ -12,9 +13,11 @@ import routerProvider, {
 
 import { App as AntdApp, ConfigProvider } from "antd";
 
+import Test from "@/components/test";
 import { resources, themeConfig } from "@/config";
 import { authProvider, dataProvider, liveProvider } from "@/providers";
 
+import db from "./api/db/connect";
 import { AlgoliaSearchWrapper, FullScreenLoading, Layout } from "./components";
 import { useAutoLoginForDemo } from "./hooks";
 import { AuditLogPage, SettingsPage } from "./routes/administration";
@@ -68,6 +71,14 @@ import "./styles/fc.css";
 import "./styles/index.css";
 
 const App: React.FC = () => {
+  useEffect(() => {
+    db.from("clients")
+      .select("*")
+      .then((data) => {
+        console.log(data, "data from db");
+      });
+  }, []);
+
   // This hook is used to automatically login the user.
   // We use this hook to skip the login page and demonstrate the application more quickly.
   const { loading } = useAutoLoginForDemo();
@@ -287,6 +298,7 @@ const App: React.FC = () => {
                 <DocumentTitleHandler />
               </Refine>
               <DevtoolsPanel />
+              <Test />
             </DevtoolsProvider>
           </AntdApp>
         </ConfigProvider>
