@@ -14,10 +14,14 @@ import routerProvider, {
 import { App as AntdApp, ConfigProvider } from "antd";
 
 import { resources, themeConfig } from "@/config";
-import { authProvider, dataProvider, liveProvider } from "@/providers";
+import { dataProvider, liveProvider } from "@/providers";
 
 import db from "./api/db/connect";
+import authProvider from "./authProvider";
 import { AlgoliaSearchWrapper, FullScreenLoading, Layout } from "./components";
+import { ForgotPasswordPage } from "./components/auth/ForgotPassword";
+import { LoginPage } from "./components/auth/Login";
+import { RegisterPage } from "./components/auth/Register";
 import { useAutoLoginForDemo } from "./hooks";
 import { AuditLogPage, SettingsPage } from "./routes/administration";
 import {
@@ -37,15 +41,14 @@ import {
   ContactsListPage,
 } from "./routes/contacts";
 import { DashboardPage } from "./routes/dashboard";
-import { ForgotPasswordPage } from "./routes/forgot-password";
-import { LoginPage } from "./routes/login";
+// import { LoginPage } from "./routes/login";
 import {
   QuotesCreatePage,
   QuotesEditPage,
   QuotesListPage,
   QuotesShowPage,
 } from "./routes/quotes";
-import { RegisterPage } from "./routes/register";
+// import { RegisterPage } from "./routes/register";
 import {
   KanbanCreatePage,
   KanbanCreateStage,

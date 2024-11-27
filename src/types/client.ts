@@ -14,3 +14,8 @@ export type TDays =
   | "friday"
   | "saturday"
   | "sunday";
+
+export interface ISignUp {
+  email: string;
+  password: string;
+}
