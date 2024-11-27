@@ -27,13 +27,7 @@ import {
   Typography,
 } from "antd";
 
-import {
-  bodyStyles,
-  containerStyles,
-  headStyles,
-  layoutStyles,
-  titleStyles,
-} from "./styles";
+import { containerStyles, layoutStyles, titleStyles } from "./styles";
 
 type ResetPassworProps = ForgotPasswordPageProps<
   LayoutProps,
@@ -82,8 +76,6 @@ export const ForgotPasswordPage: React.FC<ResetPassworProps> = ({ title }) => {
   const CardContent = (
     <Card
       title={CardTitle}
-      headStyle={headStyles}
-      bodyStyle={bodyStyles}
       style={{
         ...containerStyles,
         backgroundColor: token.colorBgElevated,
@@ -130,34 +122,32 @@ export const ForgotPasswordPage: React.FC<ResetPassworProps> = ({ title }) => {
             justifyContent: "space-between",
           }}
         >
-          {
-            <Typography.Text
+          <Typography.Text
+            style={{
+              fontSize: 12,
+              marginLeft: "auto",
+            }}
+          >
+            {translate(
+              "pages.forgotPassword.buttons.haveAccount",
+              translate(
+                "pages.register.buttons.haveAccount",
+                "Have an account? "
+              )
+            )}
+            <ActiveLink
               style={{
-                fontSize: 12,
-                marginLeft: "auto",
+                fontWeight: "bold",
+                color: token.colorPrimaryTextHover,
               }}
+              to="/login"
             >
               {translate(
-                "pages.forgotPassword.buttons.haveAccount",
-                translate(
-                  "pages.register.buttons.haveAccount",
-                  "Have an account? "
-                )
-              )}{" "}
-              <ActiveLink
-                style={{
-                  fontWeight: "bold",
-                  color: token.colorPrimaryTextHover,
-                }}
-                to="/login"
-              >
-                {translate(
-                  "pages.forgotPassword.signin",
-                  translate("pages.login.signin", "Sign in")
-                )}
-              </ActiveLink>
-            </Typography.Text>
-          }
+                "pages.forgotPassword.signin",
+                translate("pages.login.signin", "Sign in")
+              )}
+            </ActiveLink>
+          </Typography.Text>
         </div>
         <Form.Item
           style={{

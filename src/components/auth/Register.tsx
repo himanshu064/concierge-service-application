@@ -9,7 +9,6 @@ import {
 } from "@refinedev/core";
 import { useRegister, useRouterContext, useTranslate } from "@refinedev/core";
 
-// import { ThemedTitleV2 } from "@components";
 import {
   Button,
   Card,
@@ -99,20 +98,18 @@ export const RegisterPage: React.FC<RegisterProps> = ({ providers, title }) => {
               </Button>
             );
           })}
-          {
-            <Divider>
-              <Typography.Text
-                style={{
-                  color: token.colorTextLabel,
-                }}
-              >
-                {translate(
-                  "pages.register.divider",
-                  translate("pages.login.divider", "or")
-                )}
-              </Typography.Text>
-            </Divider>
-          }
+          <Divider>
+            <Typography.Text
+              style={{
+                color: token.colorTextLabel,
+              }}
+            >
+              {translate(
+                "pages.register.divider",
+                translate("pages.login.divider", "or")
+              )}
+            </Typography.Text>
+          </Divider>
         </>
       );
     }
@@ -128,125 +125,121 @@ export const RegisterPage: React.FC<RegisterProps> = ({ providers, title }) => {
       }}
     >
       {renderProviders()}
-      {
-        <Form<RegisterFormTypes>
-          layout="vertical"
-          form={form}
-          onFinish={(values) => register({ ...values })}
-          requiredMark={false}
+      <Form<RegisterFormTypes>
+        layout="vertical"
+        form={form}
+        onFinish={(values) => register({ ...values })}
+        requiredMark={false}
+      >
+        <Form.Item
+          name="name"
+          label={translate("pages.register.name", "Name")}
+          rules={[
+            {
+              required: true,
+              message: translate(
+                "pages.register.errors.requiredName",
+                "Name is required"
+              ),
+            },
+          ]}
         >
-          <Form.Item
-            name="name"
-            label={translate("pages.register.name", "Name")}
-            rules={[
-              {
-                required: true,
-                message: translate(
-                  "pages.register.errors.requiredName",
-                  "Name is required"
-                ),
-              },
-            ]}
-          >
-            <Input
-              size="large"
-              placeholder={translate("pages.register.fields.name", "Name")}
-            />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label={translate("pages.register.email", "Email")}
-            rules={[
-              {
-                required: true,
-                message: translate(
-                  "pages.register.errors.requiredEmail",
-                  "Email is required"
-                ),
-              },
-              {
-                type: "email",
-                message: translate(
-                  "pages.register.errors.validEmail",
-                  "Invalid email address"
-                ),
-              },
-            ]}
-          >
-            <Input
-              size="large"
-              placeholder={translate("pages.register.fields.email", "Email")}
-            />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            label={translate("pages.register.fields.password", "Password")}
-            rules={[
-              {
-                required: true,
-                message: translate(
-                  "pages.register.errors.requiredPassword",
-                  "Password is required"
-                ),
-              },
-            ]}
-          >
-            <Input type="password" placeholder="●●●●●●●●" size="large" />
-          </Form.Item>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "24px",
-            }}
-          ></div>
-          <Form.Item
-            style={{
-              marginBottom: 0,
-            }}
-          >
-            <Button
-              type="primary"
-              size="large"
-              htmlType="submit"
-              loading={isLoading}
-              block
-            >
-              {translate("pages.register.buttons.submit", "Sign up")}
-            </Button>
-          </Form.Item>
-        </Form>
-      }
-      {
+          <Input
+            size="large"
+            placeholder={translate("pages.register.fields.name", "Name")}
+          />
+        </Form.Item>
+        <Form.Item
+          name="email"
+          label={translate("pages.register.email", "Email")}
+          rules={[
+            {
+              required: true,
+              message: translate(
+                "pages.register.errors.requiredEmail",
+                "Email is required"
+              ),
+            },
+            {
+              type: "email",
+              message: translate(
+                "pages.register.errors.validEmail",
+                "Invalid email address"
+              ),
+            },
+          ]}
+        >
+          <Input
+            size="large"
+            placeholder={translate("pages.register.fields.email", "Email")}
+          />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          label={translate("pages.register.fields.password", "Password")}
+          rules={[
+            {
+              required: true,
+              message: translate(
+                "pages.register.errors.requiredPassword",
+                "Password is required"
+              ),
+            },
+          ]}
+        >
+          <Input type="password" placeholder="●●●●●●●●" size="large" />
+        </Form.Item>
         <div
           style={{
-            marginTop: 16,
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "24px",
+          }}
+        ></div>
+        <Form.Item
+          style={{
+            marginBottom: 0,
           }}
         >
-          <Typography.Text
+          <Button
+            type="primary"
+            size="large"
+            htmlType="submit"
+            loading={isLoading}
+            block
+          >
+            {translate("pages.register.buttons.submit", "Sign up")}
+          </Button>
+        </Form.Item>
+      </Form>
+      <div
+        style={{
+          marginTop: 16,
+        }}
+      >
+        <Typography.Text
+          style={{
+            fontSize: 12,
+          }}
+        >
+          {translate(
+            "pages.register.buttons.haveAccount",
+            translate("pages.login.buttons.haveAccount", "Have an account?")
+          )}{" "}
+          <ActiveLink
             style={{
-              fontSize: 12,
+              fontWeight: "bold",
+              color: token.colorPrimaryTextHover,
             }}
+            to="/login"
           >
             {translate(
-              "pages.register.buttons.haveAccount",
-              translate("pages.login.buttons.haveAccount", "Have an account?")
-            )}{" "}
-            <ActiveLink
-              style={{
-                fontWeight: "bold",
-                color: token.colorPrimaryTextHover,
-              }}
-              to="/login"
-            >
-              {translate(
-                "pages.register.signin",
-                translate("pages.login.signin", "Sign in")
-              )}
-            </ActiveLink>
-          </Typography.Text>
-        </div>
-      }
+              "pages.register.signin",
+              translate("pages.login.signin", "Sign in")
+            )}
+          </ActiveLink>
+        </Typography.Text>
+      </div>
     </Card>
   );
 
