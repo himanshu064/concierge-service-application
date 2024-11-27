@@ -13,7 +13,6 @@ import routerProvider, {
 
 import { App as AntdApp, ConfigProvider } from "antd";
 
-import Test from "@/components/test";
 import { resources, themeConfig } from "@/config";
 import { authProvider, dataProvider, liveProvider } from "@/providers";
 
@@ -298,7 +297,6 @@ const App: React.FC = () => {
                 <DocumentTitleHandler />
               </Refine>
               <DevtoolsPanel />
-              <Test />
             </DevtoolsProvider>
           </AntdApp>
         </ConfigProvider>

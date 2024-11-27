@@ -1,3 +1,3 @@
-export const testDB = () => {
-  console.log("Test DB");
-};
+import * as api from "@/api/modules";
+
+export default api;
