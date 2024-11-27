@@ -11,7 +11,9 @@
     "lint": "eslint src --fix",
     "refine": "refine",
     "start": "refine start",
-    "test": "jest --passWithNoTests --runInBand"
+    "test": "jest --passWithNoTests --runInBand",
+    "script": "npx tsx --inspect -- src/api/db/script.ts",
+    "ts": "npx tsx --inspect --"
   },
   "dependencies": {
     "@ant-design/icons": "5.0.1",
