@@ -3,7 +3,7 @@ import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 
 import { ErrorComponent, useNotificationProvider } from "@refinedev/antd";
 import { Authenticated, Refine } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
+// import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import routerProvider, {
   CatchAllNavigate,
   DocumentTitleHandler,
@@ -91,7 +91,7 @@ const App: React.FC = () => {
       <BrowserRouter>
         <ConfigProvider theme={themeConfig}>
           <AntdApp>
-            <DevtoolsProvider>
+            {/* <DevtoolsProvider> */}
               <Refine
                 authProvider={authProvider}
                 dataProvider={dataProvider}
@@ -296,8 +296,8 @@ const App: React.FC = () => {
                 <UnsavedChangesNotifier />
                 <DocumentTitleHandler />
               </Refine>
-              <DevtoolsPanel />
-            </DevtoolsProvider>
+              {/* <DevtoolsPanel /> */}
+            {/* </DevtoolsProvider> */}
           </AntdApp>
         </ConfigProvider>
       </BrowserRouter>
