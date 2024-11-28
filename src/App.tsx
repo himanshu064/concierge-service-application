@@ -32,8 +32,14 @@ import { supabaseClient } from "@/lib/supbaseClient";
 import authProvider from "@/lib/authProvider";
 import { AppIcon, Header } from "@/components";
 import ENV from "./env";
+import { useEffect } from "react";
+import { addData } from "./supabase/addData";
 
 function App() {
+  useEffect(() => {
+    addData();
+  }, []);
+
   return (
     <BrowserRouter>
       <AntdApp>

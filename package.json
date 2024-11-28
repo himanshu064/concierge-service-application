@@ -8,7 +8,9 @@
     "build": "refine build",
     "serve": "refine serve",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase": "supabase",
+    "ts": "npx tsx --inspect --"
   },
   "dependencies": {
     "@refinedev/antd": "^5.44.0",
@@ -22,7 +24,8 @@
     "antd": "^5.22.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "supabase": "^1.223.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
