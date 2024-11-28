@@ -5,5 +5,7 @@ CREATE TABLE clients (
     contact TEXT NOT NULL,
     address TEXT NOT NULL,
     date_of_birth DATE NOT NULL,
+    gender TEXT,
+    nationality TEXT,
     created_at TIMESTAMP DEFAULT now()
 );

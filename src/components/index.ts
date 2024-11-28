@@ -1,2 +1,13 @@
 export { AppIcon } from "./AppIcon";
 export { Header } from "./Header";
+export * from "./contacts-table";
+export * from "./custom-avatar";
+export * from "./deals-table";
+export * from "./info-form";
+export * from "./notes";
+export * from "./quotes-table";
+export * from "./title-form";
+export * from "./queue-status-tag";
+export * from "./select-optiom-with-avatar";
+export * from "./text";
+export * from "./icon";
