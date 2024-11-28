@@ -1,311 +1,149 @@
-import { useEffect } from "react";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-
-import { ErrorComponent, useNotificationProvider } from "@refinedev/antd";
-import { Authenticated, Refine } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
-import routerProvider, {
+import { App as AntdApp } from "antd";
+import {
+  AuthPage,
+  ErrorComponent,
+  ThemedLayoutV2,
+  ThemedSiderV2,
+  useNotificationProvider,
+} from "@refinedev/antd";
+import routerBindings, {
   CatchAllNavigate,
   DocumentTitleHandler,
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
-
-import { App as AntdApp, ConfigProvider } from "antd";
-
-import { resources, themeConfig } from "@/config";
-import { dataProvider, liveProvider } from "@/providers";
-
-import db from "./api/db/connect";
-import authProvider from "./authProvider";
-import { AlgoliaSearchWrapper, FullScreenLoading, Layout } from "./components";
-import { ForgotPasswordPage } from "./components/auth/ForgotPassword";
-import { LoginPage } from "./components/auth/Login";
-import { RegisterPage } from "./components/auth/Register";
-import { useAutoLoginForDemo } from "./hooks";
-import { AuditLogPage, SettingsPage } from "./routes/administration";
 import {
-  CalendarCreatePage,
-  CalendarEditPage,
-  CalendarPageWrapper,
-  CalendarShowPage,
-} from "./routes/calendar";
+  BlogPostCreate,
+  BlogPostEdit,
+  BlogPostList,
+  BlogPostShow,
+} from "@/pages/blog-posts";
 import {
-  CompanyCreatePage,
-  CompanyEditPage,
-  CompanyListPage,
-} from "./routes/companies";
-import {
-  ContactCreatePage,
-  ContactShowPage,
-  ContactsListPage,
-} from "./routes/contacts";
-import { DashboardPage } from "./routes/dashboard";
-// import { LoginPage } from "./routes/login";
-import {
-  QuotesCreatePage,
-  QuotesEditPage,
-  QuotesListPage,
-  QuotesShowPage,
-} from "./routes/quotes";
-// import { RegisterPage } from "./routes/register";
-import {
-  KanbanCreatePage,
-  KanbanCreateStage,
-  KanbanEditPage,
-  KanbanEditStage,
-  KanbanPage,
-} from "./routes/scrumboard/kanban";
-import {
-  SalesCreatePage,
-  SalesCreateStage,
-  SalesEditPage,
-  SalesEditStage,
-  SalesFinalizeDeal,
-  SalesPage,
-} from "./routes/scrumboard/sales";
-import { UpdatePasswordPage } from "./routes/update-password";
+  CategoryCreate,
+  CategoryEdit,
+  CategoryList,
+  CategoryShow,
+} from "@/pages/categories";
 
-import "./utilities/init-dayjs";
-import "@refinedev/antd/dist/reset.css";
-import "./styles/antd.css";
-import "./styles/fc.css";
-import "./styles/index.css";
+import { Refine, Authenticated } from "@refinedev/core";
+import { dataProvider, liveProvider } from "@refinedev/supabase";
+import { supabaseClient } from "@/lib/supbaseClient";
+import authProvider from "@/lib/authProvider";
+import { AppIcon, Header } from "@/components";
+import ENV from "./env";
 
-const App: React.FC = () => {
-  useEffect(() => {
-    db.from("clients")
-      .select("*")
-      .then((data) => {
-        console.log(data, "data from db");
-      });
-  }, []);
-
-  // This hook is used to automatically login the user.
-  // We use this hook to skip the login page and demonstrate the application more quickly.
-  const { loading } = useAutoLoginForDemo();
-
-  if (loading) {
-    return <FullScreenLoading />;
-  }
-
+function App() {
   return (
-    <AlgoliaSearchWrapper>
-      <BrowserRouter>
-        <ConfigProvider theme={themeConfig}>
-          <AntdApp>
-            <DevtoolsProvider>
-              <Refine
-                authProvider={authProvider}
-                dataProvider={dataProvider}
-                liveProvider={liveProvider}
-                routerProvider={routerProvider}
-                resources={resources}
-                notificationProvider={useNotificationProvider}
-                options={{
-                  liveMode: "auto",
-                  syncWithLocation: true,
-                  warnWhenUnsavedChanges: true,
-                }}
-              >
-                <Routes>
-                  <Route
-                    element={
-                      <Authenticated
-                        key="authenticated-layout"
-                        fallback={<CatchAllNavigate to="/login" />}
-                      >
-                        <Layout>
-                          <Outlet />
-                        </Layout>
-                      </Authenticated>
-                    }
+    <BrowserRouter>
+      <AntdApp>
+        <Refine
+          dataProvider={dataProvider(supabaseClient)}
+          liveProvider={liveProvider(supabaseClient)}
+          authProvider={authProvider}
+          notificationProvider={useNotificationProvider}
+          routerProvider={routerBindings}
+          resources={[
+            {
+              name: "blog_posts",
+              list: "/blog-posts",
+              create: "/blog-posts/create",
+              edit: "/blog-posts/edit/:id",
+              show: "/blog-posts/show/:id",
+              meta: {
+                canDelete: true,
+              },
+            },
+            {
+              name: "categories",
+              list: "/categories",
+              create: "/categories/create",
+              edit: "/categories/edit/:id",
+              show: "/categories/show/:id",
+              meta: {
+                canDelete: true,
+              },
+            },
+          ]}
+          options={{
+            syncWithLocation: true,
+            warnWhenUnsavedChanges: true,
+            useNewQueryKeys: true,
+            projectId: ENV.SUPABASE_PROJECT_ID,
+            title: { text: "Concierge Service Application", icon: <AppIcon /> },
+          }}
+        >
+          {/* Routes */}
+          <Routes>
+            <Route
+              element={
+                <Authenticated
+                  key="authenticated-inner"
+                  fallback={<CatchAllNavigate to="/login" />}
+                >
+                  <ThemedLayoutV2
+                    Header={Header}
+                    Sider={(props) => <ThemedSiderV2 {...props} fixed />}
                   >
-                    <Route index element={<DashboardPage />} />
-                    <Route
-                      path="/calendar"
-                      element={
-                        <CalendarPageWrapper>
-                          <Outlet />
-                        </CalendarPageWrapper>
-                      }
-                    >
-                      <Route index element={null} />
-                      <Route path="show/:id" element={<CalendarShowPage />} />
-                      <Route path="edit/:id" element={<CalendarEditPage />} />
-                      <Route path="create" element={<CalendarCreatePage />} />
-                    </Route>
-                    <Route path="/scrumboard" element={<Outlet />}>
-                      <Route
-                        path="kanban"
-                        element={
-                          <KanbanPage>
-                            <Outlet />
-                          </KanbanPage>
-                        }
-                      >
-                        <Route path="create" element={<KanbanCreatePage />} />
-                        <Route path="edit/:id" element={<KanbanEditPage />} />
-                        <Route
-                          path="stages/create"
-                          element={<KanbanCreateStage />}
-                        />
-                        <Route
-                          path="stages/edit/:id"
-                          element={<KanbanEditStage />}
-                        />
-                      </Route>
-                      <Route
-                        path="sales"
-                        element={
-                          <SalesPage>
-                            <Outlet />
-                          </SalesPage>
-                        }
-                      >
-                        <Route
-                          path="create"
-                          element={
-                            <SalesCreatePage>
-                              <Outlet />
-                            </SalesCreatePage>
-                          }
-                        >
-                          <Route
-                            path="company/create"
-                            element={<CompanyCreatePage isOverModal />}
-                          />
-                        </Route>
-                        <Route path="edit/:id" element={<SalesEditPage />} />
-                        <Route
-                          path="stages/create"
-                          element={<SalesCreateStage />}
-                        />
-                        <Route
-                          path="stages/edit/:id"
-                          element={<SalesEditStage />}
-                        />
-                        <Route
-                          path=":id/finalize"
-                          element={<SalesFinalizeDeal />}
-                        />
-                      </Route>
-                    </Route>
-                    <Route
-                      path="/companies"
-                      element={
-                        <CompanyListPage>
-                          <Outlet />
-                        </CompanyListPage>
-                      }
-                    >
-                      <Route path="create" element={<CompanyCreatePage />} />
-                    </Route>
-                    <Route
-                      path="/companies/edit/:id"
-                      element={<CompanyEditPage />}
-                    />
-                    <Route
-                      path="/contacts"
-                      element={
-                        <ContactsListPage>
-                          <Outlet />
-                        </ContactsListPage>
-                      }
-                    >
-                      <Route index element={null} />
-                      <Route path="show/:id" element={<ContactShowPage />} />
-                      <Route
-                        path="create"
-                        element={
-                          <ContactCreatePage>
-                            <Outlet />
-                          </ContactCreatePage>
-                        }
-                      >
-                        <Route
-                          path="company-create"
-                          element={<CompanyCreatePage isOverModal />}
-                        />
-                      </Route>
-                    </Route>
-                    <Route
-                      path="/quotes"
-                      element={
-                        <QuotesListPage>
-                          <Outlet />
-                        </QuotesListPage>
-                      }
-                    >
-                      <Route
-                        path="create"
-                        element={
-                          <QuotesCreatePage>
-                            <Outlet />
-                          </QuotesCreatePage>
-                        }
-                      >
-                        <Route
-                          path="company-create"
-                          element={<CompanyCreatePage isOverModal />}
-                        />
-                      </Route>
-                      <Route
-                        path="edit/:id"
-                        element={
-                          <QuotesEditPage>
-                            <Outlet />
-                          </QuotesEditPage>
-                        }
-                      >
-                        <Route
-                          path="company-create"
-                          element={<CompanyCreatePage isOverModal />}
-                        />
-                      </Route>
-                    </Route>
-                    <Route
-                      path="/quotes/show/:id"
-                      element={<QuotesShowPage />}
-                    />
-                    <Route path="/administration" element={<Outlet />}>
-                      <Route path="settings" element={<SettingsPage />} />
-                      <Route path="audit-log" element={<AuditLogPage />} />
-                    </Route>
-                    <Route path="*" element={<ErrorComponent />} />
-                  </Route>
-                  <Route
-                    element={
-                      <Authenticated
-                        key="authenticated-auth"
-                        fallback={<Outlet />}
-                      >
-                        <NavigateToResource resource="dashboard" />
-                      </Authenticated>
-                    }
-                  >
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route
-                      path="/forgot-password"
-                      element={<ForgotPasswordPage />}
-                    />
-                    <Route
-                      path="/update-password"
-                      element={<UpdatePasswordPage />}
-                    />
-                  </Route>
-                </Routes>
-                <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
-              </Refine>
-              <DevtoolsPanel />
-            </DevtoolsProvider>
-          </AntdApp>
-        </ConfigProvider>
-      </BrowserRouter>
-    </AlgoliaSearchWrapper>
+                    <Outlet />
+                  </ThemedLayoutV2>
+                </Authenticated>
+              }
+            >
+              <Route
+                index
+                element={<NavigateToResource resource="blog_posts" />}
+              />
+              <Route path="/blog-posts">
+                <Route index element={<BlogPostList />} />
+                <Route path="create" element={<BlogPostCreate />} />
+                <Route path="edit/:id" element={<BlogPostEdit />} />
+                <Route path="show/:id" element={<BlogPostShow />} />
+              </Route>
+              <Route path="/categories">
+                <Route index element={<CategoryList />} />
+                <Route path="create" element={<CategoryCreate />} />
+                <Route path="edit/:id" element={<CategoryEdit />} />
+                <Route path="show/:id" element={<CategoryShow />} />
+              </Route>
+              <Route path="*" element={<ErrorComponent />} />
+            </Route>
+            <Route
+              element={
+                <Authenticated key="authenticated-outer" fallback={<Outlet />}>
+                  <NavigateToResource />
+                </Authenticated>
+              }
+            >
+              <Route
+                path="/login"
+                element={
+                  <AuthPage
+                    type="login"
+                    formProps={{
+                      initialValues: {
+                        email: "",
+                        password: "",
+                      },
+                    }}
+                  />
+                }
+              />
+              <Route path="/register" element={<AuthPage type="register" />} />
+              <Route
+                path="/forgot-password"
+                element={<AuthPage type="forgotPassword" />}
+              />
+            </Route>
+          </Routes>
+
+          {/* Utilities */}
+          <UnsavedChangesNotifier />
+          <DocumentTitleHandler />
+        </Refine>
+      </AntdApp>
+    </BrowserRouter>
   );
-};
+}
 
 export default App;

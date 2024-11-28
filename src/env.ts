@@ -1,7 +1,8 @@
 const ENV = {
-  SUPABASE_URL: "https://cucpkxwlfwhkizukkddt.supabase.co",
+  SUPABASE_PROJECT_ID: "hvsetutgdtzcnlyysdrb",
+  SUPABASE_URL: "https://hvsetutgdtzcnlyysdrb.supabase.co",
   SUPABASE_KEY:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1Y3BreHdsZndoa2l6dWtrZGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2OTUxNDUsImV4cCI6MjA0ODI3MTE0NX0._tqTtndqhztlbST__COrTELfjkNkbw_YwxesrT_yYy8",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2c2V0dXRnZHR6Y25seXlzZHJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODMyNTk4NTIsImV4cCI6MTk5ODgzNTg1Mn0.CZ3SqCMcE69bggiyq2tacBvVihrXnaQqgwciEPBT204",
 };
 
 export default ENV;
