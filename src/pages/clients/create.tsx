@@ -83,6 +83,34 @@ export const ClientCreate = () => {
         >
           <DatePicker style={{ width: "100%" }} />
         </Form.Item>
+
+        {/* Gender  */}
+        <Form.Item
+          label={"Gender"}
+          name={["gender"]}
+          rules={[
+            {
+              required: true,
+              message: "Please enter the gender",
+            },
+          ]}
+        >
+          <Input placeholder="Enter client's gender" />
+        </Form.Item>
+
+        {/* Nationaliy */}
+        <Form.Item
+          label={"Nationality"}
+          name={["nationality"]}
+          rules={[
+            {
+              required: true,
+              message: "Please enter the Nationality",
+            },
+          ]}
+        >
+          <Input placeholder="Enter client's Nationality" />
+        </Form.Item>
       </Form>
     </Create>
   );
