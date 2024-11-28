@@ -3,7 +3,6 @@ import {
   DeleteButton,
   EditButton,
   List,
-  ShowButton,
   useTable,
 } from "@refinedev/antd";
 import { Space, Table } from "antd";
@@ -33,7 +32,7 @@ export const ClientList = () => {
           render={(_, record: BaseRecord) => (
             <Space>
               <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
+              {/* <ShowButton hideText size="small" recordItemId={record.id} /> */}
               <DeleteButton hideText size="small" recordItemId={record.id} />
             </Space>
           )}

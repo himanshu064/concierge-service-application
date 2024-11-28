@@ -1,54 +1,67 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Card, Table, Space, Button } from "antd";
-import { supabaseClient } from "@/lib/supbaseClient";
+import { Card, Table, Space, Button, Skeleton } from "antd";
+import { MailOutlined, PhoneOutlined, FileOutlined } from "@ant-design/icons";
 import { ContactStatusTag, CustomAvatar, Text } from "@/components";
-import { MailOutlined, PhoneOutlined, TeamOutlined } from "@ant-design/icons";
+import { supabaseClient } from "@/lib/supbaseClient";
+import { ICompanyContactsTableProps, IContact } from "@/types/client";
 
-export const CompanyContactsTable = () => {
-  const params = useParams();
-  const [contacts, setContacts] = useState([]);
+export const CompanyContactsTable: React.FC<ICompanyContactsTableProps> = ({
+  companyId,
+  loading: parentLoading,
+}) => {
+  const [contacts, setContacts] = useState<IContact[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchContacts = async () => {
+      if (!companyId) return;
+
       setLoading(true);
       const { data, error } = await supabaseClient
         .from("clients")
-        .select("*")
-        .eq("company_id", params.id);
+        .select("id, name, jobTitle, status, email, phone, avatar_url")
+        .eq("company_id", companyId);
 
       if (error) {
         console.error(error);
       } else {
-        setContacts(data);
+        setContacts(data || []);
       }
       setLoading(false);
     };
 
     fetchContacts();
-  }, [params.id]);
+  }, [companyId]);
 
-  const hasData = !loading && contacts.length > 0;
+  const isLoading = loading || parentLoading;
+  const hasData = !isLoading && contacts.length > 0;
 
   return (
     <Card
       title={
         <Space size="middle">
-          <TeamOutlined />
-          <Text>Contacts</Text>
+          <FileOutlined />
+          <Text>Documents</Text>
         </Space>
       }
     >
-      {!hasData && <Text>No contacts yet</Text>}
+      {isLoading && (
+        <Skeleton
+          active
+          paragraph={{ rows: 3 }}
+          title={false}
+          style={{ marginBottom: "16px" }}
+        />
+      )}
+      {!isLoading && !hasData && <Text>No contacts yet</Text>}
       {hasData && (
-        <Table dataSource={contacts} rowKey="id">
+        <Table dataSource={contacts} rowKey="id" pagination={false}>
           <Table.Column
             title="Name"
             dataIndex="name"
-            render={(_, record) => (
+            render={(_, record: IContact) => (
               <Space>
-                <CustomAvatar name={record.name} src={record.avatarUrl} />
+                <CustomAvatar name={record.name} src={record.avatar_url} />
                 <Text>{record.name}</Text>
               </Space>
             )}
@@ -57,11 +70,13 @@ export const CompanyContactsTable = () => {
           <Table.Column
             title="Stage"
             dataIndex="status"
-            render={(_, record) => <ContactStatusTag status={record.status} />}
+            render={(_, record: IContact) => (
+              <ContactStatusTag status={record.status} />
+            )}
           />
           <Table.Column
             dataIndex="id"
-            render={(_, record) => (
+            render={(_, record: IContact) => (
               <Space>
                 <Button
                   size="small"
@@ -73,7 +88,6 @@ export const CompanyContactsTable = () => {
                   href={`tel:${record.phone}`}
                   icon={<PhoneOutlined />}
                 />
-                {/* Add additional actions as needed */}
               </Space>
             )}
           />

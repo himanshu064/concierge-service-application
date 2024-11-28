@@ -1,4 +1,4 @@
-import { type FC, useMemo } from "react";
+import { type FC, useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { EditButton, FilterDropdown } from "@refinedev/antd";
@@ -10,13 +10,11 @@ import {
   PlusCircleOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Input, Select, Skeleton, Space, Table, Tag } from "antd";
+import { Card, Input, Select, Skeleton, Space, Table, Tag } from "antd";
 
 import { Text } from "@/components";
-import { useDealStagesSelect } from "@/hooks/useDealStagesSelect";
-import { useUsersSelect } from "@/hooks/useUsersSelect";
 import { currencyNumber } from "@/utilities";
-import { supabase } from "@/utils/supabaseClient";
+import { supabaseClient } from "@/lib/supbaseClient";
 
 type Props = {
   style?: React.CSSProperties;
@@ -26,15 +24,18 @@ export const CompanyDealsTable: FC<Props> = ({ style }) => {
   const { listUrl } = useNavigation();
   const params = useParams();
 
-  // Use the Supabase client to fetch data for the deals table
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [totalDealsAmount, setTotalDealsAmount] = useState<number>(0);
+
   const fetchDeals = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("clients")
       .select(
         `id, title, value, stage (id, title), dealOwnerId, dealOwner (id, name), dealContact (id, name)`
-      ) // Replace with the appropriate column names
+      )
       .eq("company_id", params.id)
       .order("updatedAt", { ascending: false });
+
     if (error) {
       console.error("Error fetching deals:", error);
       return [];
@@ -42,63 +43,43 @@ export const CompanyDealsTable: FC<Props> = ({ style }) => {
     return data;
   };
 
-  // Use the Supabase client to fetch the total deals amount
   const fetchTotalDealsAmount = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("deals")
       .select("value")
-      .eq("company_id", params.id)
-      .sum("value", { foreignTable: "deals" });
+      .eq("company_id", params.id);
+
     if (error) {
       console.error("Error fetching total deal amount:", error);
       return 0;
     }
-    return data?.[0]?.sum || 0;
+
+    const totalAmount = data?.reduce((sum, deal) => sum + (deal.value || 0), 0);
+    return totalAmount;
   };
 
-  const { selectProps: usersSelectProps } = useUsersSelect();
-  const { selectProps: dealStagesSelectProps } = useDealStagesSelect();
-
-  const [tableData, setTableData] = useMemo(() => [], []);
-  const [totalDealsAmount, setTotalDealsAmount] = useMemo(() => 0, []);
-
-  // Fetch data on component mount
-  useMemo(() => {
+  useEffect(() => {
     fetchDeals().then((data) => setTableData(data));
     fetchTotalDealsAmount().then((amount) => setTotalDealsAmount(amount));
   }, [params.id]);
 
   const hasData = tableData.length > 0;
 
-  const showResetFilters = useMemo(() => {
-    // Placeholder logic for resetting filters if needed
-    return []; // Add your filter logic
-  }, []);
-
   return (
     <Card
       style={style}
-      headStyle={{
-        borderBottom: "1px solid #D9D9D9",
-        marginBottom: "1px",
-      }}
+      headStyle={{ borderBottom: "1px solid #D9D9D9", marginBottom: "1px" }}
       bodyStyle={{ padding: 0 }}
       title={
         <Space size="middle">
           <AuditOutlined />
           <Text>Deals</Text>
-
-          {showResetFilters?.length > 0 && (
-            <Button size="small" onClick={() => setFilters([], "replace")}>
-              Reset filters
-            </Button>
-          )}
         </Space>
       }
       extra={
         <>
           <Text className="tertiary">Total deal amount: </Text>
-          {isLoadingCompany ? (
+          {totalDealsAmount === 0 ? (
             <Skeleton.Input active size="small" />
           ) : (
             <Text strong>{currencyNumber(totalDealsAmount)}</Text>
@@ -145,7 +126,6 @@ export const CompanyDealsTable: FC<Props> = ({ style }) => {
             filterDropdown={(props) => (
               <FilterDropdown {...props}>
                 <Select
-                  {...dealStagesSelectProps}
                   style={{ width: "200px" }}
                   mode="multiple"
                   placeholder="Select Stage"
@@ -156,16 +136,9 @@ export const CompanyDealsTable: FC<Props> = ({ style }) => {
           <Table.Column
             title="Participants"
             dataIndex="dealOwnerId"
-            // render={(_, record) => (
-            //   <Participants
-            //     userOne={record.dealOwner}
-            //     userTwo={record.dealContact}
-            //   />
-            // )}
             filterDropdown={(props) => (
               <FilterDropdown {...props}>
                 <Select
-                  {...usersSelectProps}
                   style={{ width: "200px" }}
                   placeholder="Select Sales Owner"
                 />

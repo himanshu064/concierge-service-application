@@ -8,6 +8,8 @@ export * from "./notes";
 export * from "./quotes-table";
 export * from "./title-form";
 export * from "./queue-status-tag";
+export * from "./contact-status-tag";
 export * from "./select-optiom-with-avatar";
+export * from "./single-element-form";
 export * from "./text";
 export * from "./icon";

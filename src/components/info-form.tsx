@@ -1,113 +1,109 @@
-// import { useState } from "react";
-
-// import { useShow } from "@refinedev/core";
-import type { GetFields } from "@refinedev/nestjs-query";
+import { useEffect, useState } from "react";
 
 import {
-  // ApiOutlined,
-  // BankOutlined,
-  // ColumnWidthOutlined,
-  // DollarOutlined,
-  // EnvironmentOutlined,
-  ShopOutlined,
+  BankOutlined,
+  CalendarOutlined,
+  ColumnWidthOutlined,
+  EnvironmentOutlined,
+  InfoCircleOutlined,
+  MailOutlined,
+  PhoneOutlined,
 } from "@ant-design/icons";
-import { Card, Space } from "antd";
-// import { Card, Input, InputNumber, Select, Space } from "antd";
+import { Card, DatePicker, Input, Select, Space } from "antd";
 
-import { Text } from "@/components";
-// import { SingleElementForm, Text } from "@/components";
-// import type {
-//   BusinessType,
-//   CompanySize,
-//   Industry,
-// } from "@/graphql/schema.types";
-import type { CompanyInfoQuery } from "@/graphql/types";
-// import { currencyNumber } from "@/utilities";
+import { SingleElementForm, Text } from "@/components";
+import type { ICompanyInfoFormProps, TCompanySize } from "@/types/client";
+import { supabaseClient } from "@/lib/supbaseClient";
+import PhoneInput from "react-phone-input-2";
+import moment from "moment";
+import { useParams } from "react-router-dom";
 
-import { COMPANY_INFO_QUERY } from "./queries";
+export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({}) => {
+  const [activeForm, setActiveForm] = useState<
+    | "email"
+    | "address"
+    | "name"
+    | "contact"
+    | "date_of_birth"
+    | "gender"
+    | "nationality"
+  >();
+  const { id } = useParams<{ id: string }>();
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [, setError] = useState<string | null>(null);
 
-type Company = GetFields<CompanyInfoQuery>;
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabaseClient
+          .from("clients")
+          .select("*")
+          .eq("id", id)
+          .single();
 
-export const CompanyInfoForm = () => {
-  // const [activeForm, setActiveForm] = useState<
-  //   | "totalRevenue"
-  //   | "industry"
-  //   | "companySize"
-  //   | "businessType"
-  //   | "country"
-  //   | "website"
-  // >();
+        if (error) throw error;
 
-  // const { query: queryResult } = useShow({
-  //   meta: {
-  //     gqlQuery: COMPANY_INFO_QUERY,
-  //   },
-  // });
+        setData(data);
+      } catch (error: any) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // const data = queryResult?.data?.data;
-  // const {
-  //   totalRevenue,
-  //   industry,
-  //   companySize,
-  //   businessType,
-  //   country,
-  //   website,
-  // } = data || {};
+    fetchData();
+  }, []);
 
-  // const getActiveForm = (args) => {
-  //   const { formName } = args;
+  const { name, email, address, contact, date_of_birth, gender, nationality } =
+    data || {};
 
-  //   if (activeForm === formName) {
-  //     return "form";
-  //   }
+  const getActiveForm = (args: any) => {
+    const { formName } = args;
 
-  //   if (!data?.[formName]) {
-  //     return "empty";
-  //   }
+    if (activeForm === formName) {
+      return "form";
+    }
 
-  //   return "view";
-  // };
+    if (!data?.[formName]) {
+      return "empty";
+    }
 
-  // const loading = queryResult?.isLoading;
+    return "view";
+  };
 
   return (
     <Card
       title={
         <Space size={15}>
-          <ShopOutlined className="sm" />
-          <Text>Company info</Text>
+          <InfoCircleOutlined className="sm" />
+          <Text>Client Info</Text>
         </Space>
       }
-      headStyle={{
-        padding: "1rem",
-      }}
-      bodyStyle={{
-        padding: "0",
-      }}
       style={{
         maxWidth: "500px",
       }}
     >
-      {/* <SingleElementForm
+      <SingleElementForm
         loading={loading}
         style={{
           padding: "0.5rem 1rem",
         }}
         icon={<ColumnWidthOutlined className="tertiary" />}
-        state={getActiveForm({ formName: "companySize" })}
+        state={getActiveForm({ formName: "name" })}
         itemProps={{
-          name: "companySize",
-          label: "Company size",
+          name: "name",
+          label: "Client Name",
         }}
-        view={<Text>{companySize}</Text>}
-        onClick={() => setActiveForm("companySize")}
+        view={<Text>{name}</Text>}
+        onClick={() => setActiveForm("name")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
-        <Select
+        <Input
           autoFocus
-          defaultValue={companySize}
-          options={companySizeOptions}
+          defaultValue={name}
           style={{
             width: "100%",
           }}
@@ -118,27 +114,18 @@ export const CompanyInfoForm = () => {
         style={{
           padding: "0.5rem 1rem",
         }}
-        icon={<DollarOutlined className="tertiary" />}
-        state={getActiveForm({ formName: "totalRevenue" })}
+        icon={<MailOutlined className="tertiary" />}
+        state={getActiveForm({ formName: "email" })}
         itemProps={{
-          name: "totalRevenue",
-          label: "Total revenue",
+          name: "email",
+          label: "Email",
         }}
-        view={<Text>{currencyNumber(totalRevenue || 0)}</Text>}
-        onClick={() => setActiveForm("totalRevenue")}
+        view={<Text>{email || null}</Text>}
+        onClick={() => setActiveForm("email")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
-        <InputNumber
-          autoFocus
-          addonBefore={"$"}
-          min={0}
-          placeholder="0,00"
-          defaultValue={totalRevenue || 0}
-          formatter={(value) =>
-            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-          }
-        />
+        <Input autoFocus placeholder="Email" defaultValue={email || null} />
       </SingleElementForm>
       <SingleElementForm
         loading={loading}
@@ -146,20 +133,19 @@ export const CompanyInfoForm = () => {
           padding: "0.5rem 1rem",
         }}
         icon={<BankOutlined className="tertiary" />}
-        state={getActiveForm({ formName: "industry" })}
+        state={getActiveForm({ formName: "address" })}
         itemProps={{
-          name: "industry",
-          label: "Industry",
+          name: "address",
+          label: "Address",
         }}
-        view={<Text>{industry}</Text>}
-        onClick={() => setActiveForm("industry")}
+        view={<Text>{address}</Text>}
+        onClick={() => setActiveForm("address")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
-        <Select
+        <Input
           autoFocus
-          defaultValue={industry}
-          options={industryOptions}
+          defaultValue={address}
           style={{
             width: "100%",
           }}
@@ -170,21 +156,79 @@ export const CompanyInfoForm = () => {
         style={{
           padding: "0.5rem 1rem",
         }}
-        icon={<ApiOutlined className="tertiary" />}
-        state={getActiveForm({ formName: "businessType" })}
+        icon={<PhoneOutlined className="tertiary" />}
+        state={getActiveForm({ formName: "contact" })}
         itemProps={{
-          name: "businessType",
-          label: "Business type",
+          name: "contact",
+          label: "Contact Number",
         }}
-        view={<Text>{businessType}</Text>}
-        onClick={() => setActiveForm("businessType")}
+        view={<Text>{contact}</Text>}
+        onClick={() => setActiveForm("contact")}
+        onUpdate={() => setActiveForm(undefined)}
+        onCancel={() => setActiveForm(undefined)}
+      >
+        <PhoneInput
+          country={"us"}
+          value={contact}
+          onChange={(phone) => {
+            console.log(phone);
+          }}
+          inputStyle={{
+            width: "100%",
+          }}
+        />
+      </SingleElementForm>
+
+      <SingleElementForm
+        loading={loading}
+        style={{
+          padding: "0.5rem 1rem",
+        }}
+        icon={<CalendarOutlined className="tertiary" />}
+        state={getActiveForm({ formName: "date_of_birth" })}
+        itemProps={{
+          name: "date_of_birth",
+          label: "DOB",
+        }}
+        view={<Text>{date_of_birth}</Text>}
+        onClick={() => setActiveForm("date_of_birth")}
+        onUpdate={() => setActiveForm(undefined)}
+        onCancel={() => setActiveForm(undefined)}
+      >
+        <DatePicker
+          autoFocus
+          defaultValue={date_of_birth ? moment(date_of_birth) : null}
+          placeholder="DOB"
+          style={{
+            width: "100%",
+          }}
+          format="YYYY-MM-DD"
+          onChange={(date, dateString) => {
+            console.log(date, dateString);
+          }}
+        />
+      </SingleElementForm>
+      <SingleElementForm
+        loading={loading}
+        style={{
+          padding: "0.5rem 1rem",
+        }}
+        icon={<EnvironmentOutlined className="tertiary" />}
+        state={getActiveForm({ formName: "gender" })}
+        itemProps={{
+          name: "gender",
+          label: "Gender",
+        }}
+        view={<Text>{gender}</Text>}
+        onClick={() => setActiveForm("gender")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <Select
           autoFocus
-          defaultValue={businessType}
-          options={businessTypeOptions}
+          defaultValue={gender || ""}
+          options={companySizeOptions}
+          placeholder="Gender"
           style={{
             width: "100%",
           }}
@@ -196,125 +240,43 @@ export const CompanyInfoForm = () => {
           padding: "0.5rem 1rem",
         }}
         icon={<EnvironmentOutlined className="tertiary" />}
-        state={getActiveForm({ formName: "country" })}
+        state={getActiveForm({ formName: "nationality" })}
         itemProps={{
-          name: "country",
-          label: "Country",
+          name: "nationality",
+          label: "Nationality",
         }}
-        view={<Text>{country}</Text>}
-        onClick={() => setActiveForm("country")}
+        view={<Text>{nationality}</Text>}
+        onClick={() => setActiveForm("nationality")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <Input
           autoFocus
-          defaultValue={country || ""}
-          placeholder="Country"
+          defaultValue={nationality || ""}
+          placeholder="Nationality"
           style={{
             width: "100%",
           }}
         />
       </SingleElementForm>
-      <SingleElementForm
-        loading={loading}
-        style={{
-          padding: "0.5rem 1rem",
-        }}
-        icon={<EnvironmentOutlined className="tertiary" />}
-        state={getActiveForm({ formName: "website" })}
-        itemProps={{
-          name: "website",
-          label: "Website",
-        }}
-        view={<Text>{website}</Text>}
-        onClick={() => setActiveForm("website")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
-      >
-        <Input
-          autoFocus
-          defaultValue={website || ""}
-          placeholder="Website"
-          style={{
-            width: "100%",
-          }}
-        />
-      </SingleElementForm> */}
     </Card>
   );
 };
 
-// const companySizeOptions: {
-//   label: string;
-//   value: CompanySize;
-// }[] = [
-//   {
-//     label: "Enterprise",
-//     value: "ENTERPRISE",
-//   },
-//   {
-//     label: "Large",
-//     value: "LARGE",
-//   },
-//   {
-//     label: "Medium",
-//     value: "MEDIUM",
-//   },
-//   {
-//     label: "Small",
-//     value: "SMALL",
-//   },
-// ];
-
-// const industryOptions: {
-//   label: string;
-//   value: Industry;
-// }[] = [
-//   { label: "Aerospace", value: "AEROSPACE" },
-//   { label: "Agriculture", value: "AGRICULTURE" },
-//   { label: "Automotive", value: "AUTOMOTIVE" },
-//   { label: "Chemicals", value: "CHEMICALS" },
-//   { label: "Construction", value: "CONSTRUCTION" },
-//   { label: "Defense", value: "DEFENSE" },
-//   { label: "Education", value: "EDUCATION" },
-//   { label: "Energy", value: "ENERGY" },
-//   { label: "Financial Services", value: "FINANCIAL_SERVICES" },
-//   { label: "Food and Beverage", value: "FOOD_AND_BEVERAGE" },
-//   { label: "Government", value: "GOVERNMENT" },
-//   { label: "Healthcare", value: "HEALTHCARE" },
-//   { label: "Hospitality", value: "HOSPITALITY" },
-//   { label: "Industrial Manufacturing", value: "INDUSTRIAL_MANUFACTURING" },
-//   { label: "Insurance", value: "INSURANCE" },
-//   { label: "Life Sciences", value: "LIFE_SCIENCES" },
-//   { label: "Logistics", value: "LOGISTICS" },
-//   { label: "Media", value: "MEDIA" },
-//   { label: "Mining", value: "MINING" },
-//   { label: "Nonprofit", value: "NONPROFIT" },
-//   { label: "Other", value: "OTHER" },
-//   { label: "Pharmaceuticals", value: "PHARMACEUTICALS" },
-//   { label: "Professional Services", value: "PROFESSIONAL_SERVICES" },
-//   { label: "Real Estate", value: "REAL_ESTATE" },
-//   { label: "Retail", value: "RETAIL" },
-//   { label: "Technology", value: "TECHNOLOGY" },
-//   { label: "Telecommunications", value: "TELECOMMUNICATIONS" },
-//   { label: "Transportation", value: "TRANSPORTATION" },
-//   { label: "Utilities", value: "UTILITIES" },
-// ];
-
-// const businessTypeOptions: {
-//   label: string;
-//   value: BusinessType;
-// }[] = [
-//   {
-//     label: "B2B",
-//     value: "B2B",
-//   },
-//   {
-//     label: "B2C",
-//     value: "B2C",
-//   },
-//   {
-//     label: "B2G",
-//     value: "B2G",
-//   },
-// ];
+const companySizeOptions: {
+  label: string;
+  value: TCompanySize;
+}[] = [
+  {
+    label: "Male",
+    value: "male",
+  },
+  {
+    label: "Female",
+    value: "female",
+  },
+  {
+    label: "Rather not say",
+    value: "others",
+  },
+];

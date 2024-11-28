@@ -1,10 +1,10 @@
-import { FC } from "react";
+import React, { FC } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "@refinedev/antd";
 import { Button, Card, Form, Input, Space, Typography } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import { LoadingOutlined, OrderedListOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { CustomAvatar, Text, TextIcon } from "@/components";
+import { CustomAvatar, Text } from "@/components";
 import { supabaseClient } from "@/lib/supbaseClient";
 import { useGetIdentity } from "@refinedev/core";
 
@@ -19,7 +19,7 @@ export const CompanyNotes: FC<Props> = ({ style }) => {
       headStyle={{ borderBottom: "1px solid #D9D9D9" }}
       title={
         <Space size={16}>
-          <TextIcon style={{ width: "24px", height: "24px" }} />
+          <OrderedListOutlined style={{ width: "24px", height: "24px" }} />
           <Text>Notes</Text>
         </Space>
       }
