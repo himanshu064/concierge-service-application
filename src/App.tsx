@@ -34,6 +34,8 @@ import { AppIcon, Header } from "@/components";
 import ENV from "./env";
 import { useEffect } from "react";
 import { addData } from "./supabase/addData";
+import { ClientList } from "./pages/clients/list";
+import { ClientCreate } from "./pages/clients/create";
 
 function App() {
   useEffect(() => {
@@ -66,6 +68,16 @@ function App() {
               create: "/categories/create",
               edit: "/categories/edit/:id",
               show: "/categories/show/:id",
+              meta: {
+                canDelete: true,
+              },
+            },
+            {
+              name: "clients",
+              list: "/clients",
+              create: "/clients/create",
+              edit: "/clients/edit/:id",
+              show: "/clients/show/:id",
               meta: {
                 canDelete: true,
               },
@@ -111,6 +123,12 @@ function App() {
                 <Route path="create" element={<CategoryCreate />} />
                 <Route path="edit/:id" element={<CategoryEdit />} />
                 <Route path="show/:id" element={<CategoryShow />} />
+              </Route>
+              <Route path="/clients">
+                <Route index element={<ClientList />} />
+                <Route path="create" element={<ClientCreate />} />
+                <Route path="edit/:id" element={<ClientCreate />} />
+                <Route path="show/:id" element={<ClientCreate />} />
               </Route>
               <Route path="*" element={<ErrorComponent />} />
             </Route>

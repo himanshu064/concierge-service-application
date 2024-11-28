@@ -36,7 +36,7 @@ const authProvider: AuthBindings = {
       if (error) {
         return {
           success: false,
-          error,
+          error,      
         };
       }
 
@@ -44,6 +44,7 @@ const authProvider: AuthBindings = {
         return {
           success: true,
           redirectTo: "/",
+          successNotification: {message:"User Logged In Successfull!",description:"Login Successfull"},
         };
       }
     } catch (error: any) {
@@ -79,6 +80,7 @@ const authProvider: AuthBindings = {
         return {
           success: true,
           redirectTo: "/",
+          successNotification: {message:"Check your email for verification link!",description:"Registration Successfull"},
         };
       }
     } catch (error: any) {
