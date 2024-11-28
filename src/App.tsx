@@ -32,6 +32,8 @@ import { supabaseClient } from "@/lib/supbaseClient";
 import authProvider from "@/lib/authProvider";
 import { AppIcon, Header } from "@/components";
 import ENV from "./env";
+import { ClientList } from "./pages/clients/list";
+import { ClientCreate } from "./pages/clients/create";
 
 function App() {
   return (
@@ -63,6 +65,16 @@ function App() {
               meta: {
                 canDelete: true,
               },
+            },
+            {
+              name: "clients",
+              list: "/clients",
+              create: "/clients/create",
+              edit: "/clients/edit/:id",
+              show: "/clients/show/:id",
+              meta: {
+                canDelete: true,
+              }
             },
           ]}
           options={{
@@ -105,6 +117,12 @@ function App() {
                 <Route path="create" element={<CategoryCreate />} />
                 <Route path="edit/:id" element={<CategoryEdit />} />
                 <Route path="show/:id" element={<CategoryShow />} />
+              </Route>
+              <Route path="/clients">
+                <Route index element={<ClientList />} />
+                <Route path="create" element={<ClientCreate />} />
+                <Route path="edit/:id" element={<ClientCreate />} />
+                <Route path="show/:id" element={<ClientCreate />} />
               </Route>
               <Route path="*" element={<ErrorComponent />} />
             </Route>
