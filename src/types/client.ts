@@ -11,7 +11,7 @@ export interface ICompany {
   email?: string;
   address?: string;
   contact?: string;
-  date_of_birth?: string;
+  date_of_birth?: Date;
   gender?: string;
   nationality?: string;
   auth_id?: string;

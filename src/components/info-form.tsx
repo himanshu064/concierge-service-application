@@ -35,6 +35,20 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
     | "gender"
     | "nationality"
   >();
+  const [tempCompany, setTempCompany] = useState<ICompany | null>(company);
+
+  const createDefaultCompany = (): ICompany => ({
+    id: "", // or some other default value
+    name: "",
+    avatar_url: "",
+    email: "",
+    address: "",
+    contact: "",
+    date_of_birth: new Date(),
+    gender: "",
+    nationality: "",
+    auth_id: "",
+  });
 
   const getActiveForm = (args: Partial<ICompany & { formName: string }>) => {
     const { formName } = args;
@@ -49,6 +63,32 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
 
     return "view";
   };
+
+  const handleCancel = () => {
+    setActiveForm(undefined);
+    setTempCompany(company);
+  };
+
+  const handleUpdateCompany = (field: keyof ICompany, value: string) => {
+    setTempCompany((prev) => {
+      if (prev === null) {
+        return createDefaultCompany();
+      }
+      return {
+        ...prev,
+        [field]: value,
+      };
+    });
+  };
+
+  const handleConfirm = () => {
+    if (tempCompany) {
+      onUpdateCompany?.(tempCompany);
+      setActiveForm(undefined);
+    }
+  };
+
+  console.log(company, "company");
 
   return (
     <Card
@@ -75,18 +115,13 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
         }}
         view={<Text>{company?.name}</Text>}
         onClick={() => setActiveForm("name")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
         <Input
           autoFocus
           defaultValue={company?.name}
-          onChange={(e) => {
-            onUpdateCompany?.({
-              ...company,
-              nationality: e.target.value,
-            } as ICompany);
-          }}
+          onChange={(e) => handleUpdateCompany("name", e.target.value)}
           style={{
             width: "100%",
           }}
@@ -105,19 +140,14 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
         }}
         view={<Text>{company?.email || null}</Text>}
         onClick={() => setActiveForm("email")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
         <Input
           autoFocus
           placeholder="Email"
           defaultValue={company?.email}
-          onChange={(e) => {
-            onUpdateCompany?.({
-              ...company,
-              email: e.target.value,
-            } as ICompany);
-          }}
+          onChange={(e) => handleUpdateCompany("email", e.target.value)}
         />
       </SingleElementForm>
       <SingleElementForm
@@ -133,18 +163,13 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
         }}
         view={<Text>{company?.address}</Text>}
         onClick={() => setActiveForm("address")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
         <Input
           autoFocus
           defaultValue={company?.address}
-          onChange={(e) => {
-            onUpdateCompany?.({
-              ...company,
-              address: e.target.value,
-            } as ICompany);
-          }}
+          onChange={(e) => handleUpdateCompany("address", e.target.value)}
           style={{
             width: "100%",
           }}
@@ -163,22 +188,20 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
         }}
         view={<Text>{company?.contact}</Text>}
         onClick={() => setActiveForm("contact")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
         <PhoneInput
           country={"us"}
           value={company?.contact}
-          onChange={(phone) => {
-            onUpdateCompany?.({ ...company, contact: phone } as ICompany);
-          }}
+          onChange={(phone) => handleUpdateCompany("contact", phone)}
           inputStyle={{
             width: "100%",
           }}
         />
       </SingleElementForm>
 
-      <SingleElementForm
+      {/* <SingleElementForm
         loading={loading}
         style={{
           padding: "0.5rem 1rem",
@@ -191,27 +214,75 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
         }}
         view={<Text>{company?.date_of_birth}</Text>}
         onClick={() => setActiveForm("date_of_birth")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
         <DatePicker
           autoFocus
           defaultValue={
-            company?.date_of_birth ? moment(company?.date_of_birth) : null
+            company?.date_of_birth &&
+            moment(company?.date_of_birth, "YYYY-MM-DD", true).isValid()
+              ? moment(company?.date_of_birth)
+              : null
           }
           placeholder="DOB"
           style={{
             width: "100%",
           }}
           format="YYYY-MM-DD"
-          onChange={(_, dateString) => {
-            onUpdateCompany?.({
-              ...company,
-              date_of_birth: dateString,
-            } as ICompany);
+          onChange={(date) => {
+            // date is a Moment object or null, dateString is a string
+
+            // If date is valid, format it to a string
+            const dateValueString = date ? date.format("YYYY-MM-DD") : "";
+
+            handleUpdateCompany("date_of_birth", dateValueString); // Pass the formatted string
           }}
         />
+      </SingleElementForm> */}
+      <SingleElementForm
+        loading={loading}
+        style={{
+          padding: "0.5rem 1rem",
+        }}
+        icon={<CalendarOutlined className="tertiary" />}
+        state={getActiveForm({ formName: "date_of_birth" })}
+        itemProps={{
+          name: "date_of_birth",
+          label: "DOB",
+        }}
+        view={
+          <Text>{moment(company?.date_of_birth).format("DD-MM-YYYY")}</Text>
+        }
+        onClick={() => setActiveForm("date_of_birth")}
+        onUpdate={() => setActiveForm(undefined)}
+        onCancel={() => setActiveForm(undefined)}
+      >
+        <DatePicker
+          autoFocus
+          defaultValue={
+            company?.date_of_birth
+              ? moment(company.date_of_birth)
+              : moment(null)
+          }
+          placeholder="DOB"
+          style={{
+            width: "100%",
+          }}
+          format="YYYY-MM-DD"
+          // onChange={(_, dateString) => {
+          //   const dateOfBirth =
+          //     typeof dateString === "string" && dateString.length > 0
+          //       ? new Date(dateString)
+          //       : undefined;
+          //   onUpdateCompany?.({
+          //     ...company,
+          //     date_of_birth: dateOfBirth,
+          //   } as ICompany);
+          // }}
+        />
       </SingleElementForm>
+
       <SingleElementForm
         loading={loading}
         style={{
@@ -225,8 +296,8 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
         }}
         view={<Text>{capitalizeWords(company?.gender || "")}</Text>}
         onClick={() => setActiveForm("gender")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
         <Select
           autoFocus
@@ -236,9 +307,7 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
           style={{
             width: "100%",
           }}
-          onChange={(value) => {
-            onUpdateCompany?.({ ...company, gender: value } as ICompany);
-          }}
+          onChange={(value) => handleUpdateCompany("gender", value)}
         />
       </SingleElementForm>
       <SingleElementForm
@@ -254,8 +323,8 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
         }}
         view={<Text>{company?.nationality}</Text>}
         onClick={() => setActiveForm("nationality")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
         <Input
           autoFocus
@@ -264,12 +333,7 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
           style={{
             width: "100%",
           }}
-          onChange={(e) => {
-            onUpdateCompany?.({
-              ...company,
-              nationality: e.target.value,
-            } as ICompany);
-          }}
+          onChange={(e) => handleUpdateCompany("nationality", e.target.value)}
         />
       </SingleElementForm>
     </Card>
