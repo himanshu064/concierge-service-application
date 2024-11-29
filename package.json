@@ -8,7 +8,9 @@
     "build": "refine build",
     "serve": "refine serve",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase": "supabase",
+    "ts": "npx tsx --inspect --"
   },
   "dependencies": {
     "@refinedev/antd": "^5.44.0",
@@ -17,11 +19,14 @@
     "@refinedev/react-router-v6": "^4.6.0",
     "@refinedev/supabase": "^5.9.4",
     "@refinedev/ui-types": "^1.22.9",
+    "@supabase/auth-helpers-react": "^0.5.0",
     "@supabase/supabase-js": "^2.46.2",
     "@uiw/react-md-editor": "^4.0.4",
     "antd": "^5.22.2",
+    "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-phone-input-2": "^2.15.1",
     "react-router-dom": "^6.28.0",
     "supabase": "^1.223.10"
   },

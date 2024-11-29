@@ -32,10 +32,19 @@ import { supabaseClient } from "@/lib/supbaseClient";
 import authProvider from "@/lib/authProvider";
 import { AppIcon, Header } from "@/components";
 import ENV from "./env";
+// import { useEffect } from "react";
+// import { addData } from "./supabase/addData";
 import { ClientList } from "./pages/clients/list";
 import { ClientCreate } from "./pages/clients/create";
+import { ClientEditPage } from "./pages/clients/edit";
+
+import "react-phone-input-2/lib/style.css";
 
 function App() {
+  // useEffect(() => {
+  //   addData();
+  // }, []);
+
   return (
     <BrowserRouter>
       <AntdApp>
@@ -74,7 +83,7 @@ function App() {
               show: "/clients/show/:id",
               meta: {
                 canDelete: true,
-              }
+              },
             },
           ]}
           options={{
@@ -121,8 +130,8 @@ function App() {
               <Route path="/clients">
                 <Route index element={<ClientList />} />
                 <Route path="create" element={<ClientCreate />} />
-                <Route path="edit/:id" element={<ClientCreate />} />
-                <Route path="show/:id" element={<ClientCreate />} />
+                <Route path="edit/:id" element={<ClientEditPage />} />
+                <Route path="show/:id" element={<ClientEditPage />} />
               </Route>
               <Route path="*" element={<ErrorComponent />} />
             </Route>
