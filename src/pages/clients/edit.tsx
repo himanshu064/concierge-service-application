@@ -25,9 +25,9 @@ const defaultCompany: ICompany = {
 export const ClientEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const [company, setCompany] = useState<ICompany>(defaultCompany);
-  const [users, setUsers] = useState<{ id: any; name: any; avatar_url: any }[]>(
-    []
-  );
+  const [users, setUsers] = useState<
+    { id: string; name: string; avatar_url: string }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export const ClientEditPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [id]);
 
   return (
     <div className="page-container">

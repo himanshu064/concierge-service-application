@@ -18,7 +18,7 @@ import PhoneInput from "react-phone-input-2";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 
-export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({}) => {
+export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
   const [activeForm, setActiveForm] = useState<
     | "email"
     | "address"
@@ -54,7 +54,7 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({}) => {
     };
 
     fetchData();
-  }, []);
+  }, [id]);
 
   const { name, email, address, contact, date_of_birth, gender, nationality } =
     data || {};
