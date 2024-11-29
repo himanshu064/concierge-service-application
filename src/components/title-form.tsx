@@ -12,7 +12,6 @@ import {
 
 export const CompanyTitleForm: React.FC<TCompanyTitleFormProps> = ({
   company,
-  // users,
   loading,
   onUpdateCompany,
 }) => {

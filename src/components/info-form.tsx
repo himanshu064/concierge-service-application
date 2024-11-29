@@ -19,6 +19,7 @@ import type {
 } from "@/types/client";
 import PhoneInput from "react-phone-input-2";
 import moment from "moment";
+import { capitalizeWords } from "@/utilities";
 
 export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
   company,
@@ -222,7 +223,7 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
           name: "gender",
           label: "Gender",
         }}
-        view={<Text>{company?.gender}</Text>}
+        view={<Text>{capitalizeWords(company?.gender || "")}</Text>}
         onClick={() => setActiveForm("gender")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}

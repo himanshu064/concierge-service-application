@@ -35,8 +35,8 @@ export interface IContact {
   avatar_url: string;
 }
 
-export interface ICompanyContactsTableProps {
-  companyId: string;
+export interface IClientDocumentsTableProps {
+  clientId: string;
   loading: boolean;
 }
 
@@ -57,7 +57,6 @@ export interface INotes {
 
 export type TCompanyTitleFormProps = {
   company: ICompany | null;
-  users: IUsers[];
   loading: boolean;
   onUpdateCompany: (value: ICompany) => void;
 };

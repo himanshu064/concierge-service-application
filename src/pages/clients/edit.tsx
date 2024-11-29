@@ -1,14 +1,14 @@
 import { Col, Row } from "antd";
 import { useEffect, useState } from "react";
 import {
-  CompanyContactsTable,
+  ClientDocumentsTable,
   CompanyInfoForm,
   CompanyNotes,
   CompanyTitleForm,
 } from "@/components";
-import { supabaseClient } from "@/lib/supbaseClient";
 import { ICompany } from "@/types/client";
 import { useParams } from "react-router-dom";
+import { fetchClientDetailsByClientId } from "@/services/clients";
 
 const defaultCompany: ICompany = {
   id: "",
@@ -24,22 +24,35 @@ const defaultCompany: ICompany = {
 
 export const ClientEditPage = () => {
   const { id } = useParams<{ id: string }>();
-  const [company, setCompany] = useState<ICompany>(defaultCompany);
-  const [users, setUsers] = useState<
-    { id: string; name: string; avatar_url: string }[]
-  >([]);
+  const [company, setCompany] = useState<ICompany | null>(defaultCompany);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const [{ data: companyData }, { data: usersData }] = await Promise.all([
-        supabaseClient.from("clients").select("*").eq("id", id).single(),
-        supabaseClient.from("clients").select("*"),
-      ]);
+      if (!id) {
+        console.error("No ID provided");
+        setCompany(null);
+        setLoading(false);
+        return;
+      }
 
-      setCompany(companyData || null);
-      setUsers(usersData || []);
-      setLoading(false);
+      try {
+        const { data: companyData, error } = await fetchClientDetailsByClientId(
+          id
+        );
+
+        if (error) {
+          console.error("Error fetching data:", error);
+          setCompany(null);
+        } else {
+          setCompany(companyData?.[0]);
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setCompany(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
@@ -49,7 +62,6 @@ export const ClientEditPage = () => {
     <div className="page-container">
       <CompanyTitleForm
         company={company}
-        users={users}
         loading={loading}
         onUpdateCompany={(updatedCompany: ICompany) =>
           setCompany(updatedCompany)
@@ -57,8 +69,8 @@ export const ClientEditPage = () => {
       />
       <Row gutter={[32, 32]} style={{ marginTop: 32 }}>
         <Col span={16}>
-          <CompanyContactsTable
-            companyId={company?.id || ""}
+          <ClientDocumentsTable
+            clientId={company?.id || ""}
             loading={loading}
           />
           <CompanyNotes style={{ marginTop: 32 }} />

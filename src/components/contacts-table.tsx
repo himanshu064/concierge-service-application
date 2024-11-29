@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Card, Table, Space, Button, Skeleton } from "antd";
 import { MailOutlined, PhoneOutlined, FileOutlined } from "@ant-design/icons";
 import { ContactStatusTag, CustomAvatar, Text } from "@/components";
-import { supabaseClient } from "@/lib/supbaseClient";
-import { ICompanyContactsTableProps, IContact } from "@/types/client";
+import { IClientDocumentsTableProps, IContact } from "@/types/client";
+import { fetchSpecificClientDetailsByClientId } from "@/services/clients";
 
-export const CompanyContactsTable: React.FC<ICompanyContactsTableProps> = ({
-  companyId,
+export const ClientDocumentsTable: React.FC<IClientDocumentsTableProps> = ({
+  clientId,
   loading: parentLoading,
 }) => {
   const [contacts, setContacts] = useState<IContact[]>([]);
@@ -14,24 +14,25 @@ export const CompanyContactsTable: React.FC<ICompanyContactsTableProps> = ({
 
   useEffect(() => {
     const fetchContacts = async () => {
-      if (!companyId) return;
+      const fields = "id, name, email, contact";
+      if (!clientId) return;
 
       setLoading(true);
-      const { data, error } = await supabaseClient
-        .from("clients")
-        .select("id, name, jobTitle, status, email, phone, avatar_url")
-        .eq("company_id", companyId);
+      const { data, error } = await fetchSpecificClientDetailsByClientId(
+        clientId,
+        fields
+      );
 
       if (error) {
         console.error(error);
       } else {
-        setContacts(data || []);
+        setContacts(data ?? []);
       }
       setLoading(false);
     };
 
     fetchContacts();
-  }, [companyId]);
+  }, [clientId]);
 
   const isLoading = loading || parentLoading;
   const hasData = !isLoading && contacts.length > 0;

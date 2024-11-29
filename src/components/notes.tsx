@@ -14,9 +14,15 @@ import {
 import { LoadingOutlined, OrderedListOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { CustomAvatar, Text } from "@/components";
-import { supabaseClient } from "@/lib/supbaseClient";
 import { useGetIdentity } from "@refinedev/core";
 import { ICompany, INotes } from "@/types/client";
+import {
+  addNoteForAClient,
+  deleteNoteOfAClient,
+  fetchClientByAuthId,
+  fetchNotesOfAClient,
+  updateNoteOfAClient,
+} from "@/services/clients";
 
 type Props = {
   style?: React.CSSProperties;
@@ -33,10 +39,7 @@ export const CompanyNotes: FC<Props> = ({ style }) => {
       if (!me?.id) return;
 
       try {
-        const { data, error } = await supabaseClient
-          .from("clients")
-          .select("*")
-          .eq("auth_id", me.id);
+        const { data, error } = await fetchClientByAuthId(me?.id);
 
         if (error) {
           console.error("Error fetching client data:", error);
@@ -94,7 +97,8 @@ export const CompanyNoteForm = ({
   setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
   const { id: companyId } = useParams();
-  const { formProps, form, formLoading } = useForm({
+  const [loading, setLoading] = useState(false);
+  const { formProps, form } = useForm({
     action: editingNoteId ? "edit" : "create",
     resource: "notes",
     redirect: false,
@@ -113,14 +117,13 @@ export const CompanyNoteForm = ({
     if (!companyId || !values?.text?.trim()) {
       return;
     }
-
+    setLoading(true);
     try {
       if (editingNoteId) {
-        // Update existing note
-        const { error } = await supabaseClient
-          .from("notes")
-          .update({ text: values.text.trim() })
-          .eq("id", editingNoteId);
+        const { error } = await updateNoteOfAClient(
+          values.text.trim(),
+          editingNoteId
+        );
 
         if (error) throw error;
 
@@ -138,18 +141,11 @@ export const CompanyNoteForm = ({
         );
       } else {
         // Create new note
-        const { data, error } = await supabaseClient
-          .from("notes")
-          .insert([
-            {
-              created_by: clientData?.name,
-              user_id: clientData?.id,
-              text: values.text.trim(),
-              created_at: new Date().toISOString(),
-            },
-          ])
-          .select("*")
-          .single();
+        const { data, error } = await addNoteForAClient(
+          clientData?.id,
+          clientData?.name,
+          values.text.trim()
+        );
 
         if (error) throw error;
 
@@ -177,6 +173,8 @@ export const CompanyNoteForm = ({
         message: "Error Saving Note",
         description: "There was an error saving your note. Please try again.",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -210,7 +208,7 @@ export const CompanyNoteForm = ({
           <Input
             placeholder="Add your note"
             style={{ backgroundColor: "#fff" }}
-            addonAfter={formLoading && <LoadingOutlined />}
+            addonAfter={loading && <LoadingOutlined />}
           />
         </Form.Item>
       </Form>
@@ -232,15 +230,11 @@ export const CompanyNoteList = ({
   editingNoteId: string | null;
   setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
+  const { id } = useParams();
   useEffect(() => {
     const fetchNotes = async () => {
-      const userId = clientData?.id;
-      if (userId) {
-        const { data, error } = await supabaseClient
-          .from("notes")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false });
+      if (id) {
+        const { data, error } = await fetchNotesOfAClient(id);
 
         if (error) {
           console.error("Error fetching notes:", error);
@@ -251,7 +245,7 @@ export const CompanyNoteList = ({
     };
 
     fetchNotes();
-  }, [clientData, setNotes]);
+  }, [clientData, setNotes, id]);
 
   return (
     <Space
@@ -298,10 +292,10 @@ export const CompanyNoteList = ({
                   initialValues={{ text: item.text }}
                   onFinish={async (values) => {
                     try {
-                      const { error } = await supabaseClient
-                        .from("notes")
-                        .update({ text: values.text })
-                        .eq("id", item.id);
+                      const { error } = await updateNoteOfAClient(
+                        values.text,
+                        item?.id
+                      );
 
                       if (error) throw error;
 
@@ -375,7 +369,7 @@ export const CompanyNoteList = ({
                 </Typography.Paragraph>
               )}
 
-              {isMe && (
+              {isMe && editingNoteId !== item.id && (
                 <Space size={16}>
                   <Typography.Link
                     type="secondary"
@@ -388,10 +382,7 @@ export const CompanyNoteList = ({
                     title="Are you sure you want to delete this note?"
                     onConfirm={async () => {
                       try {
-                        const { error } = await supabaseClient
-                          .from("notes")
-                          .delete()
-                          .eq("id", item.id);
+                        const { error } = await deleteNoteOfAClient(item?.id);
 
                         if (error) throw error;
 
