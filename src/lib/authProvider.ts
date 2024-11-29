@@ -2,6 +2,8 @@
 import { AuthBindings } from "@refinedev/core";
 
 import { supabaseClient } from "./supbaseClient";
+import { checkUserExists, registerUser } from "@/services/auth";
+import { notification } from "antd";
 
 const authProvider: AuthBindings = {
   login: async ({ email, password, providerName }) => {
@@ -36,7 +38,7 @@ const authProvider: AuthBindings = {
       if (error) {
         return {
           success: false,
-          error,      
+          error,
         };
       }
 
@@ -44,7 +46,10 @@ const authProvider: AuthBindings = {
         return {
           success: true,
           redirectTo: "/",
-          successNotification: {message:"User Logged In Successfull!",description:"Login Successfull"},
+          successNotification: {
+            message: "User Logged In Successfull!",
+            description: "Login Successfull",
+          },
         };
       }
     } catch (error: any) {
@@ -62,43 +67,110 @@ const authProvider: AuthBindings = {
       },
     };
   },
-  register: async ({ email, password }) => {
+
+  register: async ({ email, password, name }) => {
     try {
-      const { data, error } = await supabaseClient.auth.signUp({
+      // Check if the user already exists
+      const userCheckResult = await checkUserExists({email});
+      if (userCheckResult.exists === true) {
+        notification.error({
+          message: "Sign-up Failed",
+          description: "User already exists!",
+        });
+        return {
+          success: false,
+          error: {
+            message: "User already exists!",
+            name: "Sign-up Failed",
+          },
+        };
+      }
+  
+      // Sign up with email and password
+      const { data: authData, error: authError } = await supabaseClient.auth.signUp({
         email,
         password,
       });
-
-      if (error) {
+  
+      if (authError) {
+        notification.error({
+          message: "Sign-up Failed",
+          description: authError.message || "Authentication failed.",
+        });
         return {
           success: false,
-          error,
+          error: {
+            message: authError.message || "Authentication failed.",
+            name: "Sign-up Failed",
+          },
         };
       }
-
-      if (data) {
-        
+  
+      if (!authData) {
+        notification.error({
+          message: "Sign-up Failed",
+          description: "Unexpected error during sign-up.",
+        });
         return {
-          success: true,
-          redirectTo: "/",
-          successNotification: {message:"Check your email for verification link!",description:"Registration Successfull"},
+          success: false,
+          error: {
+            message: "Unexpected error during sign-up.",
+            name: "Sign-up Failed",
+          },
         };
       }
+      if(authData){
+        console.log(authData,"authData")
+      }
+      // Register the user in the database in users table
+      const auth_id = authData.user?.id;
+      const registrationResult = await registerUser({name, email,auth_id: auth_id || "",register_type:"self"});
+  
+      if (!registrationResult.success) {
+        notification.error({
+          message: "Registration Failed",
+          description: registrationResult.error?.message || "User registration failed.",
+        });
+        return {
+          success: false,
+          error: {
+            message: registrationResult.error?.message || "User registration failed.",
+            name: "Registration Failed",
+          },
+        };
+      }
+  
+      // Success response
+      notification.success({
+        message: "Registration Successful",
+        description: "You will be able log in once the admin approves your account.",
+      });
+  
+      return {
+        success: true,
+        redirectTo: "/",
+        successNotification: {
+          message: "You will be able log in once the admin approves your account.",
+          description: "Registration Successful",
+        },
+      };
     } catch (error: any) {
+      // Handle unexpected errors
+      notification.error({
+        message: "Register Failed",
+        description: error.message || "An unknown error occurred during registration.",
+      });
+  
       return {
         success: false,
-        error,
+        error: {
+          message: error.message || "An unknown error occurred during registration.",
+          name: "Register Failed",
+        },
       };
     }
-
-    return {
-      success: false,
-      error: {
-        message: "Register failed",
-        name: "Invalid email or password",
-      },
-    };
-  },
+  },  
+  
   forgotPassword: async ({ email }) => {
     try {
       const { data, error } = await supabaseClient.auth.resetPasswordForEmail(

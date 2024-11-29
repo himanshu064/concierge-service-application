@@ -13,6 +13,7 @@
     "ts": "npx tsx --inspect --"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.5.2",
     "@refinedev/antd": "^5.44.0",
     "@refinedev/cli": "^2.16.39",
     "@refinedev/core": "^4.56.0",

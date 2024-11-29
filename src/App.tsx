@@ -39,6 +39,8 @@ import { ClientCreate } from "./pages/clients/create";
 import { ClientEditPage } from "./pages/clients/edit";
 
 import "react-phone-input-2/lib/style.css";
+import { TeamOutlined } from "@ant-design/icons";
+import { RegisterPage } from "./components/RegisterPage";
 
 function App() {
   // useEffect(() => {
@@ -80,9 +82,9 @@ function App() {
               list: "/clients",
               create: "/clients/create",
               edit: "/clients/edit/:id",
-              show: "/clients/show/:id",
               meta: {
                 canDelete: true,
+                icon: <TeamOutlined />,
               },
             },
           ]}
@@ -131,7 +133,6 @@ function App() {
                 <Route index element={<ClientList />} />
                 <Route path="create" element={<ClientCreate />} />
                 <Route path="edit/:id" element={<ClientEditPage />} />
-                <Route path="show/:id" element={<ClientEditPage />} />
               </Route>
               <Route path="*" element={<ErrorComponent />} />
             </Route>
@@ -156,7 +157,12 @@ function App() {
                   />
                 }
               />
-              <Route path="/register" element={<AuthPage type="register" />} />
+              <Route
+                path="/register"
+                element={
+                 <RegisterPage/>
+                }
+              />
               <Route
                 path="/forgot-password"
                 element={<AuthPage type="forgotPassword" />}
