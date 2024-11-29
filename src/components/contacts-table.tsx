@@ -53,7 +53,7 @@ export const CompanyContactsTable: React.FC<ICompanyContactsTableProps> = ({
           style={{ marginBottom: "16px" }}
         />
       )}
-      {!isLoading && !hasData && <Text>No contacts yet</Text>}
+      {!isLoading && !hasData && <Text>No documents yet</Text>}
       {hasData && (
         <Table dataSource={contacts} rowKey="id" pagination={false}>
           <Table.Column

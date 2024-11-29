@@ -14,6 +14,7 @@ export interface ICompany {
   date_of_birth?: string;
   gender?: string;
   nationality?: string;
+  auth_id?: string;
 }
 
 export interface IUsers {
@@ -41,12 +42,24 @@ export interface ICompanyContactsTableProps {
 
 export interface ICompanyInfoFormProps {
   company: ICompany | null;
+  loading: boolean;
+  onUpdateCompany?: (updatedCompany: ICompany) => void;
+}
+
+export interface INotes {
+  id?: string;
+  text?: string;
+  created_at?: Date;
+  created_by?: string;
+  user_id?: string;
+  name?: string;
 }
 
 export type TCompanyTitleFormProps = {
   company: ICompany | null;
   users: IUsers[];
   loading: boolean;
+  onUpdateCompany: (value: ICompany) => void;
 };
 
 export type TTitleInputProps = {

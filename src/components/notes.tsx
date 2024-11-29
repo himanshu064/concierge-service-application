@@ -1,22 +1,58 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "@refinedev/antd";
-import { Button, Card, Form, Input, Space, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  notification,
+  Space,
+  Typography,
+  Popconfirm,
+} from "antd";
 import { LoadingOutlined, OrderedListOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { CustomAvatar, Text } from "@/components";
 import { supabaseClient } from "@/lib/supbaseClient";
 import { useGetIdentity } from "@refinedev/core";
+import { ICompany, INotes } from "@/types/client";
 
 type Props = {
   style?: React.CSSProperties;
 };
 
 export const CompanyNotes: FC<Props> = ({ style }) => {
+  const [notes, setNotes] = useState<INotes[]>([]);
+  const { data: me } = useGetIdentity<ICompany>();
+  const [clientData, setClientData] = useState<INotes>();
+  const [editingNoteId, setEditingNoteId] = useState<string | null>("");
+
+  useEffect(() => {
+    const fetchClientData = async () => {
+      if (!me?.id) return;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("clients")
+          .select("*")
+          .eq("auth_id", me.id);
+
+        if (error) {
+          console.error("Error fetching client data:", error);
+        } else if (data) {
+          setClientData(data?.[0]);
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+      }
+    };
+
+    fetchClientData();
+  }, [me?.id]);
+
   return (
     <Card
-      bodyStyle={{ padding: "0" }}
-      headStyle={{ borderBottom: "1px solid #D9D9D9" }}
       title={
         <Space size={16}>
           <OrderedListOutlined style={{ width: "24px", height: "24px" }} />
@@ -25,48 +61,122 @@ export const CompanyNotes: FC<Props> = ({ style }) => {
       }
       style={style}
     >
-      <CompanyNoteForm />
-      <CompanyNoteList />
+      <CompanyNoteForm
+        setNotes={setNotes}
+        clientData={clientData}
+        me={me}
+        editingNoteId={editingNoteId}
+        setEditingNoteId={setEditingNoteId}
+      />
+      <CompanyNoteList
+        notes={notes}
+        setNotes={setNotes}
+        clientData={clientData}
+        me={me}
+        editingNoteId={editingNoteId}
+        setEditingNoteId={setEditingNoteId}
+      />
     </Card>
   );
 };
 
-export const CompanyNoteForm = () => {
+export const CompanyNoteForm = ({
+  setNotes,
+  clientData,
+  me,
+  editingNoteId,
+  setEditingNoteId,
+}: {
+  setNotes: React.Dispatch<React.SetStateAction<INotes[]>>;
+  clientData: INotes | undefined;
+  me: ICompany | undefined;
+  editingNoteId: string | null;
+  setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
+}) => {
   const { id: companyId } = useParams();
-  const { data: me } = useGetIdentity();
-
   const { formProps, form, formLoading } = useForm({
-    action: "create",
-    resource: "companyNotes",
+    action: editingNoteId ? "edit" : "create",
+    resource: "notes",
     redirect: false,
     mutationMode: "optimistic",
     successNotification: () => ({
       key: "company-note",
-      message: "Successfully added note",
+      message: editingNoteId
+        ? "Successfully updated note"
+        : "Successfully added note",
       description: "Successful",
       type: "success",
     }),
   });
 
-  const handleOnFinish = async (values) => {
-    if (!companyId || !values.note.trim()) {
+  const handleOnFinish = async (values: INotes) => {
+    if (!companyId || !values?.text?.trim()) {
       return;
     }
 
     try {
-      const { error } = await supabaseClient.from("company_notes").insert([
-        {
-          company_id: companyId,
-          created_by: me.id,
-          note: values.note.trim(),
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      if (editingNoteId) {
+        // Update existing note
+        const { error } = await supabaseClient
+          .from("notes")
+          .update({ text: values.text.trim() })
+          .eq("id", editingNoteId);
 
-      if (error) throw error;
+        if (error) throw error;
+
+        notification.success({
+          message: "Note Updated",
+          description: "Your note was successfully updated.",
+        });
+
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note.id === editingNoteId
+              ? { ...note, text: values?.text?.trim() }
+              : note
+          )
+        );
+      } else {
+        // Create new note
+        const { data, error } = await supabaseClient
+          .from("notes")
+          .insert([
+            {
+              created_by: clientData?.name,
+              user_id: clientData?.id,
+              text: values.text.trim(),
+              created_at: new Date().toISOString(),
+            },
+          ])
+          .select("*")
+          .single();
+
+        if (error) throw error;
+
+        notification.success({
+          message: "Note Added",
+          description: "Your note was successfully added.",
+        });
+
+        setNotes((prevNotes) => [
+          {
+            id: data?.id,
+            created_by: clientData?.name,
+            user_id: clientData?.id,
+            text: values?.text?.trim(),
+            created_at: new Date(),
+          },
+          ...prevNotes,
+        ]);
+      }
       form.resetFields();
+      setEditingNoteId(null);
     } catch (error) {
-      console.error("Error adding note:", error);
+      console.error("Error saving note:", error);
+      notification.error({
+        message: "Error Saving Note",
+        description: "There was an error saving your note. Please try again.",
+      });
     }
   };
 
@@ -83,11 +193,11 @@ export const CompanyNoteForm = () => {
       <CustomAvatar
         style={{ flexShrink: 0 }}
         name={me?.name}
-        src={me?.avatarUrl}
+        src={me?.avatar_url || ""}
       />
       <Form {...formProps} style={{ width: "100%" }} onFinish={handleOnFinish}>
         <Form.Item
-          name="note"
+          name="text"
           noStyle
           rules={[
             {
@@ -108,29 +218,40 @@ export const CompanyNoteForm = () => {
   );
 };
 
-export const CompanyNoteList = () => {
-  const params = useParams();
-  const { data: me } = useGetIdentity();
-
-  const [notes, setNotes] = React.useState([]);
-
-  React.useEffect(() => {
+export const CompanyNoteList = ({
+  notes,
+  setNotes,
+  clientData,
+  editingNoteId,
+  setEditingNoteId,
+}: {
+  notes: INotes[];
+  setNotes: React.Dispatch<React.SetStateAction<INotes[]>>;
+  clientData: INotes | undefined;
+  me: ICompany | undefined;
+  editingNoteId: string | null;
+  setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
+}) => {
+  useEffect(() => {
     const fetchNotes = async () => {
-      const { data, error } = await supabaseClient
-        .from("company_notes")
-        .select(`id, created_by, note, created_at`)
-        .eq("company_id", params.id)
-        .order("created_at", { ascending: false });
+      const userId = clientData?.id;
+      if (userId) {
+        const { data, error } = await supabaseClient
+          .from("notes")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching notes:", error);
-      } else {
-        setNotes(data);
+        if (error) {
+          console.error("Error fetching notes:", error);
+        } else if (data) {
+          setNotes(data as INotes[]);
+        }
       }
     };
 
     fetchNotes();
-  }, [params.id]);
+  }, [clientData, setNotes]);
 
   return (
     <Space
@@ -144,14 +265,13 @@ export const CompanyNoteList = () => {
       }}
     >
       {notes.map((item) => {
-        const isMe = me?.id === item.created_by;
-
+        const isMe = clientData?.id === item.user_id;
         return (
           <div key={item.id} style={{ display: "flex", gap: "12px" }}>
             <CustomAvatar
               style={{ flexShrink: 0 }}
               name={item.created_by}
-              src={item.created_by?.avatarUrl}
+              src={""}
             />
             <div
               style={{
@@ -173,40 +293,133 @@ export const CompanyNoteList = () => {
                   {dayjs(item.created_at).format("MMMM D, YYYY - h:ma")}
                 </Text>
               </div>
-              <Typography.Paragraph
-                style={{
-                  boxShadow: "0px 1px 2px 0px rgba(0, 0, 0, 0.03)",
-                  background: "#fff",
-                  borderRadius: "6px",
-                  padding: "8px",
-                  marginBottom: 0,
-                }}
-                ellipsis={{ rows: 3, expandable: true }}
-              >
-                {item.note}
-              </Typography.Paragraph>
+              {editingNoteId === item.id ? (
+                <Form
+                  initialValues={{ text: item.text }}
+                  onFinish={async (values) => {
+                    try {
+                      const { error } = await supabaseClient
+                        .from("notes")
+                        .update({ text: values.text })
+                        .eq("id", item.id);
+
+                      if (error) throw error;
+
+                      setNotes((prevNotes) =>
+                        prevNotes.map((note) =>
+                          note.id === item.id
+                            ? { ...note, text: values.text }
+                            : note
+                        )
+                      );
+
+                      notification.success({
+                        message: "Note Updated",
+                        description: "Your note was successfully updated.",
+                      });
+                      setEditingNoteId(null);
+                    } catch (error) {
+                      console.error("Error updating note:", error);
+                      notification.error({
+                        message: "Error Updating Note",
+                        description:
+                          "There was an error updating your note. Please try again.",
+                      });
+                    }
+                  }}
+                >
+                  <Form.Item
+                    name="text"
+                    rules={[
+                      {
+                        required: true,
+                        transform: (value) => value?.trim(),
+                        message: "Please enter a note",
+                      },
+                    ]}
+                  >
+                    <Input.TextArea
+                      autoFocus
+                      style={{
+                        boxShadow: "0px 1px 2px 0px rgba(0, 0, 0, 0.03)",
+                        background: "#fff",
+                        borderRadius: "6px",
+                        padding: "8px",
+                      }}
+                    />
+                  </Form.Item>
+                  <Space>
+                    <Button type="primary" htmlType="submit">
+                      Save
+                    </Button>
+                    <Button
+                      type="default"
+                      onClick={() => setEditingNoteId(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </Space>
+                </Form>
+              ) : (
+                <Typography.Paragraph
+                  style={{
+                    boxShadow: "0px 1px 2px 0px rgba(0, 0, 0, 0.03)",
+                    background: "#fff",
+                    borderRadius: "6px",
+                    padding: "8px",
+                    marginBottom: 0,
+                  }}
+                  ellipsis={{ rows: 3, expandable: true }}
+                >
+                  {item.text}
+                </Typography.Paragraph>
+              )}
+
               {isMe && (
                 <Space size={16}>
                   <Typography.Link
                     type="secondary"
                     style={{ fontSize: "12px" }}
+                    onClick={() => setEditingNoteId(item?.id || null)}
                   >
                     Edit
                   </Typography.Link>
-                  <Button
-                    type="link"
-                    danger
-                    onClick={async () => {
-                      const { error } = await supabaseClient
-                        .from("company_notes")
-                        .delete()
-                        .eq("id", item.id);
-                      if (error) console.error("Error deleting note:", error);
-                      else setNotes(notes.filter((n) => n.id !== item.id));
+                  <Popconfirm
+                    title="Are you sure you want to delete this note?"
+                    onConfirm={async () => {
+                      try {
+                        const { error } = await supabaseClient
+                          .from("notes")
+                          .delete()
+                          .eq("id", item.id);
+
+                        if (error) throw error;
+
+                        setNotes((prevNotes) =>
+                          prevNotes.filter((n) => n.id !== item.id)
+                        );
+
+                        notification.success({
+                          message: "Note Deleted",
+                          description: "Your note was successfully deleted.",
+                        });
+                      } catch (error) {
+                        console.error("Error deleting note:", error);
+                        notification.error({
+                          message: "Error Deleting Note",
+                          description:
+                            "There was an error deleting your note. Please try again.",
+                        });
+                      }
                     }}
+                    onCancel={() => console.log("Delete cancelled")}
+                    okText="Yes"
+                    cancelText="No"
                   >
-                    Delete
-                  </Button>
+                    <Button type="link" danger>
+                      Delete
+                    </Button>
+                  </Popconfirm>
                 </Space>
               )}
             </div>
