@@ -2,8 +2,6 @@ import { supabaseClient } from "@/lib/supbaseClient";
 
 // / Function to check if a user exists by email
 export const checkUserExists = async ({ email }: { email: string }) => {
-  console.log(email, "Email in checkUserExists");
-
   const { data: existingUser, error: fetchError } = await supabaseClient
     .from("Users")
     .select("email")
