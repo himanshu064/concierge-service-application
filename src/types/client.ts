@@ -70,6 +70,8 @@ export type TBusinessType = "B2B" | "B2C" | "B2G";
 
 export type TCompanySize = "male" | "female" | "others";
 
+export type TRegisterType = "self" | "invited";
+
 export type TIndustry =
   | "AEROSPACE"
   | "AGRICULTURE"

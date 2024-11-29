@@ -146,23 +146,20 @@ function App() {
               <Route
                 path="/login"
                 element={
-                  <AuthPage
-                    type="login"
-                    formProps={{
-                      initialValues: {
-                        email: "",
-                        password: "",
-                      },
-                    }}
-                  />
+                    <div className="login-container">
+                      <AuthPage
+                        type="login"
+                        formProps={{
+                          initialValues: {
+                            email: "",
+                            password: "",
+                          },
+                        }}
+                      />
+                    </div>
                 }
               />
-              <Route
-                path="/register"
-                element={
-                 <RegisterPage/>
-                }
-              />
+              <Route path="/register" element={<RegisterPage />} />
               <Route
                 path="/forgot-password"
                 element={<AuthPage type="forgotPassword" />}

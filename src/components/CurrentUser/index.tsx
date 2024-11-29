@@ -22,7 +22,6 @@ export const CurrentUser: React.FC = () => {
 //   const [opened, setOpened] = useState(false);
   const { data: user } = useGetIdentity<IUser>();
   const { mutate: logout } = useLogout();
-console.log(user,"user suer")
   const content = (
     <div
       style={{

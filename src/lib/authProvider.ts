@@ -2,7 +2,11 @@
 import { AuthBindings } from "@refinedev/core";
 
 import { supabaseClient } from "./supbaseClient";
-import { checkUserExists, registerUser } from "@/services/auth";
+import {
+  checkUserExists,
+  getUserAuthStatus,
+  registerUser,
+} from "@/services/auth";
 import { notification } from "antd";
 
 const authProvider: AuthBindings = {
@@ -28,6 +32,21 @@ const authProvider: AuthBindings = {
           };
         }
       }
+      const authStatus = await getUserAuthStatus({ email });
+      
+      if (authStatus.user?.is_authorized === "pending") {
+        notification.error({
+          description: "Please wait for admin approval to gain access to the system. ",
+          message: "Awaiting Admin Approval",
+        });
+        return {
+          success: false,
+          error: {
+            message: "Please wait for admin approval to gain access to the system.",
+            name: "Awaiting Admin Approval",
+          },
+        };
+      }
 
       // sign in with email and password
       const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -41,6 +60,8 @@ const authProvider: AuthBindings = {
           error,
         };
       }
+
+     
 
       if (data?.user) {
         return {
@@ -71,7 +92,7 @@ const authProvider: AuthBindings = {
   register: async ({ email, password, name }) => {
     try {
       // Check if the user already exists
-      const userCheckResult = await checkUserExists({email});
+      const userCheckResult = await checkUserExists({ email });
       if (userCheckResult.exists === true) {
         notification.error({
           message: "Sign-up Failed",
@@ -85,13 +106,14 @@ const authProvider: AuthBindings = {
           },
         };
       }
-  
+
       // Sign up with email and password
-      const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-        email,
-        password,
-      });
-  
+      const { data: authData, error: authError } =
+        await supabaseClient.auth.signUp({
+          email,
+          password,
+        });
+
       if (authError) {
         notification.error({
           message: "Sign-up Failed",
@@ -105,7 +127,7 @@ const authProvider: AuthBindings = {
           },
         };
       }
-  
+
       if (!authData) {
         notification.error({
           message: "Sign-up Failed",
@@ -119,38 +141,44 @@ const authProvider: AuthBindings = {
           },
         };
       }
-      if(authData){
-        console.log(authData,"authData")
-      }
       // Register the user in the database in users table
       const auth_id = authData.user?.id;
-      const registrationResult = await registerUser({name, email,auth_id: auth_id || "",register_type:"self"});
-  
+      const registrationResult = await registerUser({
+        name,
+        email,
+        auth_id: auth_id || "",
+        register_type: "self",
+      });
+
       if (!registrationResult.success) {
         notification.error({
           message: "Registration Failed",
-          description: registrationResult.error?.message || "User registration failed.",
+          description:
+            registrationResult.error?.message || "User registration failed.",
         });
         return {
           success: false,
           error: {
-            message: registrationResult.error?.message || "User registration failed.",
+            message:
+              registrationResult.error?.message || "User registration failed.",
             name: "Registration Failed",
           },
         };
       }
-  
+
       // Success response
       notification.success({
         message: "Registration Successful",
-        description: "You will be able log in once the admin approves your account.",
+        description:
+          "You will be able log in once the admin approves your account.",
       });
-  
+
       return {
         success: true,
         redirectTo: "/",
         successNotification: {
-          message: "You will be able log in once the admin approves your account.",
+          message:
+            "You will be able log in once the admin approves your account.",
           description: "Registration Successful",
         },
       };
@@ -158,19 +186,21 @@ const authProvider: AuthBindings = {
       // Handle unexpected errors
       notification.error({
         message: "Register Failed",
-        description: error.message || "An unknown error occurred during registration.",
+        description:
+          error.message || "An unknown error occurred during registration.",
       });
-  
+
       return {
         success: false,
         error: {
-          message: error.message || "An unknown error occurred during registration.",
+          message:
+            error.message || "An unknown error occurred during registration.",
           name: "Register Failed",
         },
       };
     }
-  },  
-  
+  },
+
   forgotPassword: async ({ email }) => {
     try {
       const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
