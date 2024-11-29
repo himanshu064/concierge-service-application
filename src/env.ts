@@ -1,8 +1,8 @@
 const ENV = {
-  SUPABASE_PROJECT_ID: "remsmcritowxpjebkeow",
-  SUPABASE_URL: "https://remsmcritowxpjebkeow.supabase.co",
+  SUPABASE_PROJECT_ID: "hkyyirvjystbqgjkiafu",
+  SUPABASE_URL: "https://hkyyirvjystbqgjkiafu.supabase.co",
   SUPABASE_KEY:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlbXNtY3JpdG93eHBqZWJrZW93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2ODY1NTIsImV4cCI6MjA0ODI2MjU1Mn0.ljVEOL4N06k2jjftHW8aVZw2AE9UDW8KdPQEC1OIycQ",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhreXlpcnZqeXN0YnFnamtpYWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3ODYzNjksImV4cCI6MjA0ODM2MjM2OX0.HuGjyIK2ueoeK6-wyxIiVGhGblSwMN4YOKGrVGsqaGA",
 };
 
 export default ENV;
