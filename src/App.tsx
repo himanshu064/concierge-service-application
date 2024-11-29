@@ -13,18 +13,6 @@ import routerBindings, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
-import {
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostList,
-  BlogPostShow,
-} from "@/pages/blog-posts";
-import {
-  CategoryCreate,
-  CategoryEdit,
-  CategoryList,
-  CategoryShow,
-} from "@/pages/categories";
 
 import { Refine, Authenticated } from "@refinedev/core";
 import { dataProvider, liveProvider } from "@refinedev/supabase";
@@ -57,26 +45,6 @@ function App() {
           notificationProvider={useNotificationProvider}
           routerProvider={routerBindings}
           resources={[
-            {
-              name: "blog_posts",
-              list: "/blog-posts",
-              create: "/blog-posts/create",
-              edit: "/blog-posts/edit/:id",
-              show: "/blog-posts/show/:id",
-              meta: {
-                canDelete: true,
-              },
-            },
-            {
-              name: "categories",
-              list: "/categories",
-              create: "/categories/create",
-              edit: "/categories/edit/:id",
-              show: "/categories/show/:id",
-              meta: {
-                canDelete: true,
-              },
-            },
             {
               name: "clients",
               list: "/clients",
@@ -115,20 +83,8 @@ function App() {
             >
               <Route
                 index
-                element={<NavigateToResource resource="blog_posts" />}
+                element={<NavigateToResource resource="clients" />}
               />
-              <Route path="/blog-posts">
-                <Route index element={<BlogPostList />} />
-                <Route path="create" element={<BlogPostCreate />} />
-                <Route path="edit/:id" element={<BlogPostEdit />} />
-                <Route path="show/:id" element={<BlogPostShow />} />
-              </Route>
-              <Route path="/categories">
-                <Route index element={<CategoryList />} />
-                <Route path="create" element={<CategoryCreate />} />
-                <Route path="edit/:id" element={<CategoryEdit />} />
-                <Route path="show/:id" element={<CategoryShow />} />
-              </Route>
               <Route path="/clients">
                 <Route index element={<ClientList />} />
                 <Route path="create" element={<ClientCreate />} />
@@ -146,23 +102,20 @@ function App() {
               <Route
                 path="/login"
                 element={
-                  <AuthPage
-                    type="login"
-                    formProps={{
-                      initialValues: {
-                        email: "",
-                        password: "",
-                      },
-                    }}
-                  />
+                  <div className="login-container">
+                    <AuthPage
+                      type="login"
+                      formProps={{
+                        initialValues: {
+                          email: "",
+                          password: "",
+                        },
+                      }}
+                    />
+                  </div>
                 }
               />
-              <Route
-                path="/register"
-                element={
-                 <RegisterPage/>
-                }
-              />
+              <Route path="/register" element={<RegisterPage />} />
               <Route
                 path="/forgot-password"
                 element={<AuthPage type="forgotPassword" />}

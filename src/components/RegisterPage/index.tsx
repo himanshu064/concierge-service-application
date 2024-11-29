@@ -16,8 +16,6 @@ export const RegisterPage = () => {
           const nameElement = document.querySelectorAll(
             "#register-form #name"
           )[0] as HTMLInputElement;
-          console.log(nameElement.value, "name element");
-          console.log("Form values:", values); // Capture all field values, including custom ones
           authProvider.register?.({name: nameElement.value, ...values });
         },
       }}
