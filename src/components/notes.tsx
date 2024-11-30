@@ -14,12 +14,11 @@ import {
 import { LoadingOutlined, OrderedListOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { CustomAvatar, Text } from "@/components";
-import { useGetIdentity } from "@refinedev/core";
-import { ICompany, INotes } from "@/types/client";
+import { useGetIdentity, useOne } from "@refinedev/core";
+import { IClient, INotes } from "@/types/client";
 import {
   addNoteForAClient,
   deleteNoteOfAClient,
-  fetchClientByAuthId,
   fetchNotesOfAClient,
   updateNoteOfAClient,
 } from "@/services/clients";
@@ -30,29 +29,22 @@ type Props = {
 
 export const CompanyNotes: FC<Props> = ({ style }) => {
   const [notes, setNotes] = useState<INotes[]>([]);
-  const { data: me } = useGetIdentity<ICompany>();
-  const [clientData, setClientData] = useState<INotes>();
+  const { data } = useGetIdentity<IClient>();
   const [editingNoteId, setEditingNoteId] = useState<string | null>("");
+  const id = data?.id;
 
-  useEffect(() => {
-    const fetchClientData = async () => {
-      if (!me?.id) return;
+  const { data: client } = useOne<IClient>({
+    resource: "clients",
+    id,
+    queryOptions: {
+      enabled: !!id,
+    },
+    meta: {
+      fields: ["*"],
+    },
+  });
 
-      try {
-        const { data, error } = await fetchClientByAuthId(me?.id);
-
-        if (error) {
-          console.error("Error fetching client data:", error);
-        } else if (data) {
-          setClientData(data?.[0]);
-        }
-      } catch (error) {
-        console.error("Unexpected error:", error);
-      }
-    };
-
-    fetchClientData();
-  }, [me?.id]);
+  console.log(client, "client client");
 
   return (
     <Card
@@ -66,16 +58,16 @@ export const CompanyNotes: FC<Props> = ({ style }) => {
     >
       <CompanyNoteForm
         setNotes={setNotes}
-        clientData={clientData}
-        me={me}
+        client={client}
+        me={data}
         editingNoteId={editingNoteId}
         setEditingNoteId={setEditingNoteId}
       />
       <CompanyNoteList
         notes={notes}
         setNotes={setNotes}
-        clientData={clientData}
-        me={me}
+        client={client}
+        me={data}
         editingNoteId={editingNoteId}
         setEditingNoteId={setEditingNoteId}
       />
@@ -85,14 +77,14 @@ export const CompanyNotes: FC<Props> = ({ style }) => {
 
 export const CompanyNoteForm = ({
   setNotes,
-  clientData,
+  client,
   me,
   editingNoteId,
   setEditingNoteId,
 }: {
   setNotes: React.Dispatch<React.SetStateAction<INotes[]>>;
-  clientData: INotes | undefined;
-  me: ICompany | undefined;
+  client: INotes | undefined;
+  me: IClient | undefined;
   editingNoteId: string | null;
   setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
@@ -142,8 +134,8 @@ export const CompanyNoteForm = ({
       } else {
         // Create new note
         const { data, error } = await addNoteForAClient(
-          clientData?.id,
-          clientData?.name,
+          client?.id,
+          client?.name,
           values.text.trim()
         );
 
@@ -157,8 +149,8 @@ export const CompanyNoteForm = ({
         setNotes((prevNotes) => [
           {
             id: data?.id,
-            created_by: clientData?.name,
-            user_id: clientData?.id,
+            created_by: client?.name,
+            user_id: client?.id,
             text: values?.text?.trim(),
             created_at: new Date(),
           },
@@ -188,11 +180,7 @@ export const CompanyNoteForm = ({
         borderBottom: "1px solid #F0F0F0",
       }}
     >
-      <CustomAvatar
-        style={{ flexShrink: 0 }}
-        name={me?.name}
-        src={me?.avatar_url || ""}
-      />
+      <CustomAvatar style={{ flexShrink: 0 }} name={me?.name} src={""} />
       <Form {...formProps} style={{ width: "100%" }} onFinish={handleOnFinish}>
         <Form.Item
           name="text"
@@ -219,17 +207,19 @@ export const CompanyNoteForm = ({
 export const CompanyNoteList = ({
   notes,
   setNotes,
-  clientData,
+  client,
   editingNoteId,
   setEditingNoteId,
 }: {
   notes: INotes[];
   setNotes: React.Dispatch<React.SetStateAction<INotes[]>>;
-  clientData: INotes | undefined;
-  me: ICompany | undefined;
+  client: INotes | undefined;
+  me: IClient | undefined;
   editingNoteId: string | null;
   setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
+  console.log(client, "clientData clientData");
+
   const { id } = useParams();
   useEffect(() => {
     const fetchNotes = async () => {
@@ -245,7 +235,19 @@ export const CompanyNoteList = ({
     };
 
     fetchNotes();
-  }, [clientData, setNotes, id]);
+  }, [client, setNotes, id]);
+  // const { data, isLoading, error } = useOne<INotes>({
+  //   resource: "notes",
+  //   id,
+  //   meta: {
+  //     query: {
+  //       filter: { user_id: id },
+  //       sort: [{ field: "created_at", order: "desc" }],
+  //     },
+  //   },
+  // });
+
+  // console.log(data, "data datadatadata");
 
   return (
     <Space
@@ -259,7 +261,7 @@ export const CompanyNoteList = ({
       }}
     >
       {notes.map((item) => {
-        const isMe = clientData?.id === item.user_id;
+        const isMe = client?.id === item.user_id;
         return (
           <div key={item.id} style={{ display: "flex", gap: "12px" }}>
             <CustomAvatar
@@ -282,7 +284,7 @@ export const CompanyNoteList = ({
                   alignItems: "center",
                 }}
               >
-                <Text style={{ fontWeight: 500 }}>{item.created_by}</Text>
+                <Text style={{ fontWeight: 500 }}>{client?.data?.name}</Text>
                 <Text size="xs" style={{ color: "#000000a6" }}>
                   {dayjs(item.created_at).format("MMMM D, YYYY - h:ma")}
                 </Text>
