@@ -16,6 +16,18 @@ export interface ICompany {
   nationality?: string;
   auth_id?: string;
 }
+export interface IClient {
+  id: string;
+  name?: string;
+  email?: string;
+  address?: string;
+  contact?: string;
+  date_of_birth?: string;
+  gender?: string;
+  nationality?: string;
+  token? : string;
+  expires_at? : string;
+}
 
 export interface IUsers {
   id: string;

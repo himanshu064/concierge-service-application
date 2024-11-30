@@ -1,17 +1,52 @@
+import { generateInviteLink, sendInviteEmail } from "@/services/auth";
 import { Create, useForm } from "@refinedev/antd";
+import { useCreate } from "@refinedev/core";
 import { Form, Input, DatePicker, notification, Select } from "antd";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 export const ClientCreate = () => {
   const { formProps, saveButtonProps } = useForm({});
+  const { mutate } = useCreate({
+    resource: "invites",
+    
+  });
+  const navigate = useNavigate();
 
   const handleSave = async (values) => {
-    console.log("Form Values: ", values);
+    // Generate a unique token
+    const token = uuidv4();
 
-    // Example: Display a notification
-    notification.success({
-      message: "Client Saved",
-      description: `Client ${values.name} has been saved successfully.`,
-    });
+    // Set token expiration (e.g., 1 hours from now)
+    const expires_at = new Date();
+    expires_at.setHours(expires_at.getHours() + 1);
+
+    const clientInfo = {
+      ...values,
+      token: token,
+      expires_at: expires_at.toISOString(),
+    };
+    try {
+      await mutate(
+        { values: clientInfo },
+        {
+          onSuccess: async () => {
+            formProps.form?.resetFields(); // Reset the form
+            const inviteLink = await generateInviteLink({token:token});
+            console.log(inviteLink,"inviteLink");
+            await sendInviteEmail({email:values.email, inviteLink: inviteLink || ""});
+            navigate("/clients"); // Navigate to the clients page
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      notification.error({
+        message: "Unexpected Error",
+        description: "An unexpected error occurred. Please try again later.",
+      });
+    }
+
   };
 
   return (
@@ -21,7 +56,16 @@ export const ClientCreate = () => {
         onClick: () => formProps.form?.submit(),
       }}
     >
-      <Form {...formProps} layout="vertical" onFinish={handleSave}>
+      <Form
+        {...formProps}
+        layout="vertical"
+        onFinish={handleSave}
+        form={formProps.form}
+        onValuesChange={() => {
+          // Manually clear the browser's "unsaved changes" flag
+          window.onbeforeunload = null;
+        }}
+      >
         {/* Name Field */}
         <Form.Item
           label={"Name"}
