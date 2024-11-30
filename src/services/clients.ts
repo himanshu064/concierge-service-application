@@ -30,28 +30,28 @@ export const fetchSpecificClientDetailsByClientId = async (
   }
 };
 
-// export const fetchClientDetailsByClientId = async (clientId: string) => {
-//   if (!clientId) {
-//     throw new Error("Company ID is required to fetch clients.");
-//   }
+export const fetchClientDetailsByClientId = async (clientId: string) => {
+  if (!clientId) {
+    throw new Error("Company ID is required to fetch clients.");
+  }
 
-//   try {
-//     const { data, error } = await supabaseClient
-//       .from("clients")
-//       .select("*")
-//       .eq("id", clientId);
+  try {
+    const { data, error } = await supabaseClient
+      .from("clients")
+      .select("*")
+      .eq("id", clientId);
 
-//     if (error) {
-//       console.error("Error fetching clients:", error);
-//       return { data: null, error };
-//     }
+    if (error) {
+      console.error("Error fetching clients:", error);
+      return { data: null, error };
+    }
 
-//     return { data, error: null };
-//   } catch (err) {
-//     console.error("Unexpected error fetching clients:", err);
-//     return { data: null, error: err };
-//   }
-// };
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error fetching clients:", err);
+    return { data: null, error: err };
+  }
+};
 
 export const fetchNotesOfAClient = async (clientId: string) => {
   if (!clientId) {

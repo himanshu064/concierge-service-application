@@ -1,25 +1,17 @@
-// import { useState } from "react";
-// 
-import { useGetIdentity, useLogout } from "@refinedev/core";
-
-import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 import { Button, Popover } from "antd";
+import { useGetIdentity, useLogout } from "@refinedev/core";
+import { LogoutOutlined, SettingOutlined } from "@ant-design/icons";
 
-// import type { User } from "@/graphql/schema.types";
-
-import { CustomAvatar } from "../custom-avatar";
-import { Text } from "../text";
-// import { AccountSettings } from "./account-settings";
+import { CustomAvatar, Text } from "@/components";
 
 type IUser = {
-    id: number;
-    name: string;
-    email: string;
-    avatar: string;
-  };
+  id: number;
+  name: string;
+  email: string;
+  avatar: string;
+};
 
 export const CurrentUser: React.FC = () => {
-//   const [opened, setOpened] = useState(false);
   const { data: user } = useGetIdentity<IUser>();
   const { mutate: logout } = useLogout();
   const content = (
@@ -51,7 +43,6 @@ export const CurrentUser: React.FC = () => {
           icon={<SettingOutlined />}
           type="text"
           block
-        //   onClick={() => setOpened(true)}
         >
           Account settings
         </Button>
@@ -85,13 +76,6 @@ export const CurrentUser: React.FC = () => {
           style={{ cursor: "pointer" }}
         />
       </Popover>
-      {/* {user && (
-        // <AccountSettings
-        //   opened={opened}
-        //   setOpened={setOpened}
-        //   userId={user.id}
-        // />
-      )} */}
     </>
   );
 };
