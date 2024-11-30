@@ -1,0 +1,2 @@
+ALTER TABLE notes
+ADD COLUMN created_by TEXT NOT NULL;

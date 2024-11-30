@@ -47,7 +47,14 @@ export const ClientEditPage = () => {
 
   return (
     <div className="page-container">
-      <CompanyTitleForm company={company} users={users} loading={loading} />
+      <CompanyTitleForm
+        company={company}
+        users={users}
+        loading={loading}
+        onUpdateCompany={(updatedCompany: ICompany) =>
+          setCompany(updatedCompany)
+        }
+      />
       <Row gutter={[32, 32]} style={{ marginTop: 32 }}>
         <Col span={16}>
           <CompanyContactsTable
@@ -57,7 +64,13 @@ export const ClientEditPage = () => {
           <CompanyNotes style={{ marginTop: 32 }} />
         </Col>
         <Col span={8}>
-          <CompanyInfoForm company={company} />
+          <CompanyInfoForm
+            company={company}
+            loading={loading}
+            onUpdateCompany={(updatedCompany: ICompany) =>
+              setCompany(updatedCompany)
+            }
+          />
         </Col>
       </Row>
     </div>

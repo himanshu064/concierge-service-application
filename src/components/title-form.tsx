@@ -4,16 +4,26 @@ import { Form, Skeleton, Space } from "antd";
 import { CustomAvatar, Text } from "@/components";
 import { getNameInitials } from "@/utilities";
 import styles from "./title-form.module.css";
-import { TCompanyTitleFormProps, TTitleInputProps } from "@/types/client";
+import {
+  ICompany,
+  TCompanyTitleFormProps,
+  TTitleInputProps,
+} from "@/types/client";
 
 export const CompanyTitleForm: React.FC<TCompanyTitleFormProps> = ({
   company,
   // users,
   loading,
+  onUpdateCompany,
 }) => {
   const { formProps, onFinish } = useForm({
     redirect: false,
   });
+
+  const handleNameChange = (value: string) => {
+    const updatedCompany = { ...company, name: value } as ICompany;
+    onUpdateCompany(updatedCompany);
+  };
 
   return (
     <Form {...formProps}>
@@ -42,6 +52,7 @@ export const CompanyTitleForm: React.FC<TCompanyTitleFormProps> = ({
                 onFinish?.({
                   name: value,
                 });
+                handleNameChange(value);
               }}
             />
           </Form.Item>

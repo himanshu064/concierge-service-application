@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   BankOutlined,
@@ -12,13 +12,19 @@ import {
 import { Card, DatePicker, Input, Select, Space } from "antd";
 
 import { SingleElementForm, Text } from "@/components";
-import type { ICompanyInfoFormProps, TCompanySize } from "@/types/client";
-import { supabaseClient } from "@/lib/supbaseClient";
+import type {
+  ICompany,
+  ICompanyInfoFormProps,
+  TCompanySize,
+} from "@/types/client";
 import PhoneInput from "react-phone-input-2";
 import moment from "moment";
-import { useParams } from "react-router-dom";
 
-export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
+export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
+  company,
+  loading,
+  onUpdateCompany,
+}) => {
   const [activeForm, setActiveForm] = useState<
     | "email"
     | "address"
@@ -28,45 +34,15 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
     | "gender"
     | "nationality"
   >();
-  const { id } = useParams<{ id: string }>();
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await supabaseClient
-          .from("clients")
-          .select("*")
-          .eq("id", id)
-          .single();
-
-        if (error) throw error;
-
-        setData(data);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
-  const { name, email, address, contact, date_of_birth, gender, nationality } =
-    data || {};
-
-  const getActiveForm = (args: any) => {
+  const getActiveForm = (args: Partial<ICompany & { formName: string }>) => {
     const { formName } = args;
 
     if (activeForm === formName) {
       return "form";
     }
 
-    if (!data?.[formName]) {
+    if (!company?.[formName as keyof ICompany]) {
       return "empty";
     }
 
@@ -96,14 +72,20 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
           name: "name",
           label: "Client Name",
         }}
-        view={<Text>{name}</Text>}
+        view={<Text>{company?.name}</Text>}
         onClick={() => setActiveForm("name")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <Input
           autoFocus
-          defaultValue={name}
+          defaultValue={company?.name}
+          onChange={(e) => {
+            onUpdateCompany?.({
+              ...company,
+              nationality: e.target.value,
+            } as ICompany);
+          }}
           style={{
             width: "100%",
           }}
@@ -120,12 +102,22 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
           name: "email",
           label: "Email",
         }}
-        view={<Text>{email || null}</Text>}
+        view={<Text>{company?.email || null}</Text>}
         onClick={() => setActiveForm("email")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
-        <Input autoFocus placeholder="Email" defaultValue={email || null} />
+        <Input
+          autoFocus
+          placeholder="Email"
+          defaultValue={company?.email}
+          onChange={(e) => {
+            onUpdateCompany?.({
+              ...company,
+              email: e.target.value,
+            } as ICompany);
+          }}
+        />
       </SingleElementForm>
       <SingleElementForm
         loading={loading}
@@ -138,14 +130,20 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
           name: "address",
           label: "Address",
         }}
-        view={<Text>{address}</Text>}
+        view={<Text>{company?.address}</Text>}
         onClick={() => setActiveForm("address")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <Input
           autoFocus
-          defaultValue={address}
+          defaultValue={company?.address}
+          onChange={(e) => {
+            onUpdateCompany?.({
+              ...company,
+              address: e.target.value,
+            } as ICompany);
+          }}
           style={{
             width: "100%",
           }}
@@ -162,16 +160,16 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
           name: "contact",
           label: "Contact Number",
         }}
-        view={<Text>{contact}</Text>}
+        view={<Text>{company?.contact}</Text>}
         onClick={() => setActiveForm("contact")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <PhoneInput
           country={"us"}
-          value={contact}
+          value={company?.contact}
           onChange={(phone) => {
-            console.log(phone);
+            onUpdateCompany?.({ ...company, contact: phone } as ICompany);
           }}
           inputStyle={{
             width: "100%",
@@ -190,21 +188,26 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
           name: "date_of_birth",
           label: "DOB",
         }}
-        view={<Text>{date_of_birth}</Text>}
+        view={<Text>{company?.date_of_birth}</Text>}
         onClick={() => setActiveForm("date_of_birth")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <DatePicker
           autoFocus
-          defaultValue={date_of_birth ? moment(date_of_birth) : null}
+          defaultValue={
+            company?.date_of_birth ? moment(company?.date_of_birth) : null
+          }
           placeholder="DOB"
           style={{
             width: "100%",
           }}
           format="YYYY-MM-DD"
-          onChange={(date, dateString) => {
-            console.log(date, dateString);
+          onChange={(_, dateString) => {
+            onUpdateCompany?.({
+              ...company,
+              date_of_birth: dateString,
+            } as ICompany);
           }}
         />
       </SingleElementForm>
@@ -219,18 +222,21 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
           name: "gender",
           label: "Gender",
         }}
-        view={<Text>{gender}</Text>}
+        view={<Text>{company?.gender}</Text>}
         onClick={() => setActiveForm("gender")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <Select
           autoFocus
-          defaultValue={gender || ""}
+          defaultValue={company?.gender || ""}
           options={companySizeOptions}
           placeholder="Gender"
           style={{
             width: "100%",
+          }}
+          onChange={(value) => {
+            onUpdateCompany?.({ ...company, gender: value } as ICompany);
           }}
         />
       </SingleElementForm>
@@ -245,17 +251,23 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = () => {
           name: "nationality",
           label: "Nationality",
         }}
-        view={<Text>{nationality}</Text>}
+        view={<Text>{company?.nationality}</Text>}
         onClick={() => setActiveForm("nationality")}
         onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <Input
           autoFocus
-          defaultValue={nationality || ""}
+          defaultValue={company?.nationality || ""}
           placeholder="Nationality"
           style={{
             width: "100%",
+          }}
+          onChange={(e) => {
+            onUpdateCompany?.({
+              ...company,
+              nationality: e.target.value,
+            } as ICompany);
           }}
         />
       </SingleElementForm>
