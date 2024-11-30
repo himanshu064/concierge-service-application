@@ -1,14 +1,27 @@
 import { Create, useForm } from "@refinedev/antd";
-import { Form, Input, DatePicker } from "antd";
+import { Form, Input, DatePicker, notification, Select } from "antd";
 
 export const ClientCreate = () => {
-  const { formProps, saveButtonProps  } = useForm({
-   
-  });
+  const { formProps, saveButtonProps } = useForm({});
+
+  const handleSave = async (values) => {
+    console.log("Form Values: ", values);
+
+    // Example: Display a notification
+    notification.success({
+      message: "Client Saved",
+      description: `Client ${values.name} has been saved successfully.`,
+    });
+  };
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
-      <Form {...formProps} layout="vertical">
+    <Create
+      saveButtonProps={{
+        ...saveButtonProps,
+        onClick: () => formProps.form?.submit(),
+      }}
+    >
+      <Form {...formProps} layout="vertical" onFinish={handleSave}>
         {/* Name Field */}
         <Form.Item
           label={"Name"}
@@ -91,11 +104,15 @@ export const ClientCreate = () => {
           rules={[
             {
               required: true,
-              message: "Please enter the gender",
+              message: "Please select the gender",
             },
           ]}
         >
-          <Input placeholder="Enter client's gender" />
+          <Select placeholder="Select client's gender">
+            <Select.Option value="male">Male</Select.Option>
+            <Select.Option value="female">Female</Select.Option>
+            <Select.Option value="others">Rather not say</Select.Option>
+          </Select>
         </Form.Item>
 
         {/* Nationaliy */}

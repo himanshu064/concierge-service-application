@@ -27,8 +27,9 @@ import { ClientCreate } from "./pages/clients/create";
 import { ClientEditPage } from "./pages/clients/edit";
 
 import "react-phone-input-2/lib/style.css";
-import { TeamOutlined } from "@ant-design/icons";
+import { IdcardOutlined, TeamOutlined } from "@ant-design/icons";
 import { RegisterPage } from "./components/RegisterPage";
+import { InvitationList } from "./pages/clientInvites/list";
 
 function App() {
   // useEffect(() => {
@@ -55,6 +56,14 @@ function App() {
                 icon: <TeamOutlined />,
               },
             },
+            {
+              name: "invites",
+              list: "/invitations",
+              meta:{
+                canDelete: true,
+                icon: <IdcardOutlined />,
+              }
+            }
           ]}
           options={{
             syncWithLocation: true,
@@ -89,6 +98,9 @@ function App() {
                 <Route index element={<ClientList />} />
                 <Route path="create" element={<ClientCreate />} />
                 <Route path="edit/:id" element={<ClientEditPage />} />
+              </Route>
+              <Route path="/invitations">
+              <Route index element={<InvitationList />} />
               </Route>
               <Route path="*" element={<ErrorComponent />} />
             </Route>
