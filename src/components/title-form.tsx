@@ -3,26 +3,28 @@ import { EditOutlined } from "@ant-design/icons";
 import { Form, Skeleton, Space } from "antd";
 import { CustomAvatar, Text } from "@/components";
 import { getNameInitials } from "@/utilities";
+import { IContact, TTitleInputProps } from "@/types/client";
 import styles from "./title-form.module.css";
-import {
-  ICompany,
-  TCompanyTitleFormProps,
-  TTitleInputProps,
-} from "@/types/client";
 
-export const CompanyTitleForm: React.FC<TCompanyTitleFormProps> = ({
-  company,
-  loading,
-  onUpdateCompany,
-}) => {
-  const { formProps, onFinish } = useForm({
-    redirect: false,
+export const CompanyTitleForm = () => {
+  const {
+    formProps,
+    onFinish,
+    query: queryResult,
+  } = useForm<IContact>({
+    // action: "edit",
+    // redirect: false,
+    // autoSave: {
+    //   enabled: false,
+    // },
+    // queryOptions: {
+    //   enabled: false,
+    // },
+    // mutationMode: "optimistic",
   });
 
-  const handleNameChange = (value: string) => {
-    const updatedCompany = { ...company, name: value } as ICompany;
-    onUpdateCompany(updatedCompany);
-  };
+  const name = queryResult?.data?.data?.name;
+  console.log(name, "name is here!")
 
   return (
     <Form {...formProps}>
@@ -30,8 +32,8 @@ export const CompanyTitleForm: React.FC<TCompanyTitleFormProps> = ({
         <CustomAvatar
           size="large"
           shape="square"
-          src={""}
-          name={getNameInitials(company?.name || "")}
+          src={null}
+          name={getNameInitials(name || "")}
           style={{
             width: 96,
             height: 96,
@@ -45,13 +47,12 @@ export const CompanyTitleForm: React.FC<TCompanyTitleFormProps> = ({
         <Space direction="vertical" size={0}>
           <Form.Item name="name" required noStyle>
             <TitleInput
-              value={company?.name || ""}
-              loading={loading}
+              value={""}
+              loading={false}
               onChange={(value: string) => {
                 onFinish?.({
                   name: value,
                 });
-                handleNameChange(value);
               }}
             />
           </Form.Item>
@@ -63,8 +64,8 @@ export const CompanyTitleForm: React.FC<TCompanyTitleFormProps> = ({
 
 const TitleInput: React.FC<TTitleInputProps> = ({
   value,
-  onChange,
   loading,
+  onChange,
 }) => {
   return (
     <Text

@@ -6,6 +6,18 @@ import nodemailer from "npm:nodemailer";
 console.log("Email sending function initialized!");
 
 Deno.serve(async (req) => {
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*", // Allow requests from any domain
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS", // Allowed methods
+    "Access-Control-Allow-Headers": "Content-Type, Authorization", // Allowed headers
+    "Content-Type": "application/json",
+  };
+
+  // Handle preflight (OPTIONS) request
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
   try {
     // Parse the incoming request body
     const { email, subject, message } = await req.json();
@@ -14,7 +26,7 @@ Deno.serve(async (req) => {
     if (!email || !subject || !message) {
       return new Response(
         JSON.stringify({ error: "Missing email, subject, or message" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -43,7 +55,7 @@ Deno.serve(async (req) => {
     // Return a success response
     return new Response(
       JSON.stringify({ success: true, message: "Email sent successfully!" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error) {
     console.error("Error sending email:", error);
@@ -51,7 +63,7 @@ Deno.serve(async (req) => {
     // Return an error response
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: corsHeaders }
     );
   }
 });
