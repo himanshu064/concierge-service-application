@@ -201,46 +201,6 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
           }}
         />
       </SingleElementForm>
-
-      {/* <SingleElementForm
-        loading={loading}
-        style={{
-          padding: "0.5rem 1rem",
-        }}
-        icon={<CalendarOutlined className="tertiary" />}
-        state={getActiveForm({ formName: "date_of_birth" })}
-        itemProps={{
-          name: "date_of_birth",
-          label: "DOB",
-        }}
-        view={<Text>{company?.date_of_birth}</Text>}
-        onClick={() => setActiveForm("date_of_birth")}
-        onUpdate={handleConfirm}
-        onCancel={handleCancel}
-      >
-        <DatePicker
-          autoFocus
-          defaultValue={
-            company?.date_of_birth &&
-            moment(company?.date_of_birth, "YYYY-MM-DD", true).isValid()
-              ? moment(company?.date_of_birth)
-              : null
-          }
-          placeholder="DOB"
-          style={{
-            width: "100%",
-          }}
-          format="YYYY-MM-DD"
-          onChange={(date) => {
-            // date is a Moment object or null, dateString is a string
-
-            // If date is valid, format it to a string
-            const dateValueString = date ? date.format("YYYY-MM-DD") : "";
-
-            handleUpdateCompany("date_of_birth", dateValueString); // Pass the formatted string
-          }}
-        />
-      </SingleElementForm> */}
       <SingleElementForm
         loading={loading}
         style={{

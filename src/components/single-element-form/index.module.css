@@ -1,55 +1,74 @@
 .container {
-    min-height: 64px;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    align-items: flex-start;
-    padding: 0.5rem 0.8rem;
-    border-bottom: 1px solid rgba(217, 217, 217, 1);
-
-    .icon {
-        padding-right: 15px;
-        align-self: flex-start;
-    }
-
-    .content {
-        flex: 1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .input {
-            flex: 1;
-            margin-right: 0.8rem;
-
-            .formItem {
-                padding-top: 0.5rem;
-            }
-
-            .skeleton {
-                height: 1rem;
-            }
-        }
-
-        .label {
-            user-select: none;
-            display: block;
-        }
-
-        .buttons {
-            align-self: flex-end;
-            display: flex;
-            gap: 0.5rem;
-        }
-    }
-
-    .actions {
-        align-self: center;
-        display: flex;
-        gap: 0.5rem;
-    }
+  min-height: 64px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: flex-start;
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid rgba(217, 217, 217, 1);
 }
-/* 
-.container:last-child {
-    border: none;
-} */
+.icon {
+  padding-right: 15px;
+  align-self: flex-start;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  user-select: none;
+  display: block;
+}
+
+.buttons {
+  align-self: flex-end;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions {
+  align-self: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input {
+  flex: 1;
+  margin-right: 0.8rem;
+}
+
+.formItem {
+  padding-top: 0.5rem;
+}
+
+.skeleton {
+  height: 1rem;
+}
+
+@media only screen and (max-width: 1240px) {
+  .content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .buttons {
+    align-self: flex-start;
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 12px;
+  }
+
+  .input {
+    flex: 1;
+    margin-right: 0.8rem;
+    width: 100%;
+  }
+}
