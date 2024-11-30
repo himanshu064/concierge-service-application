@@ -1,3 +1,4 @@
-export const capitalizeWords = (text: string) => {
+export const capitalizeWords = (text?: string) => {
+  if (!text) return "";
   return text?.charAt(0)?.toUpperCase() + text?.slice(1);
 };

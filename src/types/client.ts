@@ -1,20 +1,24 @@
+import { TRoles } from "./role";
+
 export interface ISalesOwner {
   id: string;
   avatar_url: string;
   name: string;
 }
 
-export interface ICompany {
+export interface IClient {
   id: string;
   name?: string;
-  avatar_url?: string;
   email?: string;
-  address?: string;
   contact?: string;
-  date_of_birth?: Date | string | null;
+  address?: string;
+  date_of_birth?: string;
   gender?: string;
   nationality?: string;
   auth_id?: string;
+  is_authorized?: TAuthorizedStatus;
+  register_type?: TRegisterType;
+  role: TRoles;
 }
 
 export interface IUsers {
@@ -34,15 +38,10 @@ export interface IContact {
   date_of_birth?: string;
 }
 
-export interface IClientDocumentsTableProps {
-  clientId: string;
-  loading: boolean;
-}
-
 export interface ICompanyInfoFormProps {
-  company: ICompany | null;
+  company: IClient | null;
   loading: boolean;
-  onUpdateCompany?: (updatedCompany: ICompany) => void;
+  onUpdateCompany?: (updatedCompany: IClient) => void;
 }
 
 export interface INotes {
@@ -53,12 +52,6 @@ export interface INotes {
   user_id?: string;
   name?: string;
 }
-
-export type TCompanyTitleFormProps = {
-  company: ICompany | null;
-  loading: boolean;
-  onUpdateCompany: (value: ICompany) => void;
-};
 
 export type TTitleInputProps = {
   value: string;
@@ -77,6 +70,7 @@ export type TSalesOwnerInputProps = {
   users: IUsers[];
 };
 
+export type TAuthorizedStatus = "approved" | "pending";
 export type TBusinessType = "B2B" | "B2C" | "B2G";
 
 export type TCompanySize = "male" | "female" | "others";
