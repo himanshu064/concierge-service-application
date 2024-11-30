@@ -11,7 +11,7 @@ export interface ICompany {
   email?: string;
   address?: string;
   contact?: string;
-  date_of_birth?: Date;
+  date_of_birth?: Date | string | null;
   gender?: string;
   nationality?: string;
   auth_id?: string;
@@ -28,11 +28,10 @@ export interface IUsers {
 export interface IContact {
   id: string;
   name: string;
-  jobTitle: string;
-  status: string;
   email: string;
-  phone: string;
-  avatar_url: string;
+  contact?: string;
+  address?: string;
+  date_of_birth?: string;
 }
 
 export interface IClientDocumentsTableProps {

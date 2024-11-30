@@ -13,7 +13,7 @@ export const fetchSpecificClientDetailsByClientId = async (
     const { data, error } = await supabaseClient
       .from("clients")
       .select(fields)
-      .eq("company_id", clientId);
+      .eq("id", clientId);
 
     if (error) {
       console.error("Error fetching clients:", error);

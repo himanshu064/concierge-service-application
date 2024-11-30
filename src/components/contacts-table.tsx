@@ -1,41 +1,22 @@
-import { useEffect, useState } from "react";
 import { Card, Table, Space, Button, Skeleton } from "antd";
 import { MailOutlined, PhoneOutlined, FileOutlined } from "@ant-design/icons";
-import { ContactStatusTag, CustomAvatar, Text } from "@/components";
+import { CustomAvatar, Text } from "@/components";
 import { IClientDocumentsTableProps, IContact } from "@/types/client";
-import { fetchSpecificClientDetailsByClientId } from "@/services/clients";
+import { useOne } from "@refinedev/core";
 
 export const ClientDocumentsTable: React.FC<IClientDocumentsTableProps> = ({
   clientId,
-  loading: parentLoading,
 }) => {
-  const [contacts, setContacts] = useState<IContact[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchContacts = async () => {
-      const fields = "id, name, email, contact";
-      if (!clientId) return;
-
-      setLoading(true);
-      const { data, error } = await fetchSpecificClientDetailsByClientId(
-        clientId,
-        fields
-      );
-
-      if (error) {
-        console.error(error);
-      } else {
-        setContacts(data ?? []);
-      }
-      setLoading(false);
-    };
-
-    fetchContacts();
-  }, [clientId]);
-
-  const isLoading = loading || parentLoading;
-  const hasData = !isLoading && contacts.length > 0;
+  const { data, isLoading } = useOne({
+    resource: "clients", // Supabase resource name
+    id: clientId, // Record ID to fetch
+    queryOptions: {
+      enabled: !!clientId, // Prevent query from running without clientId
+    },
+    meta: {
+      fields: ["id, name, email, contact"], // Specify the fields you need
+    },
+  });
 
   return (
     <Card
@@ -54,27 +35,27 @@ export const ClientDocumentsTable: React.FC<IClientDocumentsTableProps> = ({
           style={{ marginBottom: "16px" }}
         />
       )}
-      {!isLoading && !hasData && <Text>No documents yet</Text>}
-      {hasData && (
-        <Table dataSource={contacts} rowKey="id" pagination={false}>
+      {!isLoading && <Text>No documents yet</Text>}
+      {data && (
+        <Table dataSource={[]} rowKey="id" pagination={false}>
           <Table.Column
             title="Name"
             dataIndex="name"
             render={(_, record: IContact) => (
               <Space>
-                <CustomAvatar name={record.name} src={record.avatar_url} />
+                <CustomAvatar name={record.name} src={record.name} />
                 <Text>{record.name}</Text>
               </Space>
             )}
           />
           <Table.Column title="Title" dataIndex="jobTitle" />
-          <Table.Column
+          {/* <Table.Column
             title="Stage"
             dataIndex="status"
             render={(_, record: IContact) => (
-              <ContactStatusTag status={record.status} />
+              <ContactStatusTag status={record.} />
             )}
-          />
+          /> */}
           <Table.Column
             dataIndex="id"
             render={(_, record: IContact) => (
@@ -86,7 +67,7 @@ export const ClientDocumentsTable: React.FC<IClientDocumentsTableProps> = ({
                 />
                 <Button
                   size="small"
-                  href={`tel:${record.phone}`}
+                  href={`tel:${record.contact}`}
                   icon={<PhoneOutlined />}
                 />
               </Space>

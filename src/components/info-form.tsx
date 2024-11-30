@@ -20,6 +20,8 @@ import type {
 import PhoneInput from "react-phone-input-2";
 import moment from "moment";
 import { capitalizeWords } from "@/utilities";
+import dayjs from "dayjs";
+import DateProvider from "@/providers/date-provider";
 
 export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
   company,
@@ -44,7 +46,7 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
     email: "",
     address: "",
     contact: "",
-    date_of_birth: new Date(),
+    date_of_birth: null,
     gender: "",
     nationality: "",
     auth_id: "",
@@ -83,12 +85,11 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
 
   const handleConfirm = () => {
     if (tempCompany) {
+      console.log(tempCompany, "tempCompany tempCompany");
       onUpdateCompany?.(tempCompany);
       setActiveForm(undefined);
     }
   };
-
-  console.log(company, "company");
 
   return (
     <Card
@@ -251,36 +252,34 @@ export const CompanyInfoForm: React.FC<ICompanyInfoFormProps> = ({
           name: "date_of_birth",
           label: "DOB",
         }}
-        view={
-          <Text>{moment(company?.date_of_birth).format("DD-MM-YYYY")}</Text>
-        }
+        view={<Text>{moment(company?.date_of_birth).format("LL")}</Text>}
         onClick={() => setActiveForm("date_of_birth")}
-        onUpdate={() => setActiveForm(undefined)}
-        onCancel={() => setActiveForm(undefined)}
+        onUpdate={handleConfirm}
+        onCancel={handleCancel}
       >
-        <DatePicker
-          autoFocus
-          defaultValue={
-            company?.date_of_birth
-              ? moment(company.date_of_birth)
-              : moment(null)
-          }
-          placeholder="DOB"
-          style={{
-            width: "100%",
-          }}
-          format="YYYY-MM-DD"
-          // onChange={(_, dateString) => {
-          //   const dateOfBirth =
-          //     typeof dateString === "string" && dateString.length > 0
-          //       ? new Date(dateString)
-          //       : undefined;
-          //   onUpdateCompany?.({
-          //     ...company,
-          //     date_of_birth: dateOfBirth,
-          //   } as ICompany);
-          // }}
-        />
+        <DateProvider>
+          <DatePicker
+            autoFocus
+            defaultValue={
+              company?.date_of_birth
+                ? dayjs(new Date(company.date_of_birth))
+                : undefined
+            }
+            placeholder="DOB"
+            style={{
+              width: "100%",
+            }}
+            format="DD-MM-YYYY"
+            onChange={(date) => {
+              // date is a Moment object or null, dateString is a string
+
+              // If date is valid, format it to a string
+              const dateValueString = date ? date.format("YYYY-MM-DD") : "";
+
+              handleUpdateCompany("date_of_birth", dateValueString); // Pass the formatted string
+            }}
+          />
+        </DateProvider>
       </SingleElementForm>
 
       <SingleElementForm
