@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "@refinedev/antd";
 import {
@@ -18,6 +18,7 @@ import {
   useList,
   useDelete,
   useUpdate,
+  useOne,
 } from "@refinedev/core";
 import dayjs from "dayjs";
 
@@ -67,6 +68,28 @@ export const NotesSection: FC<Props> = ({ style }) => {
     ],
   });
 
+  useEffect(() => {
+    const fetchClients = async () => {
+      const clients = await Promise.all(
+        notes.map(async (note) => {
+          if (note.user_id) {
+            const { data } = await useOne<IClient>({
+              resource: "clients",
+              id: note.user_id,
+            });
+            return data;
+          }
+          return null;
+        })
+      );
+      setNoteClients(clients.filter((client) => client !== null) as IClient[]);
+    };
+
+    if (notes.length) {
+      fetchClients();
+    }
+  }, [notes]);
+
   return (
     <Card
       title={
@@ -77,13 +100,13 @@ export const NotesSection: FC<Props> = ({ style }) => {
       }
       style={style}
     >
-      <CompanyNoteForm
+      <NoteForm
         client={client?.data?.[0]}
         clientAuthData={data}
         editingNoteId={editingNoteId}
         setEditingNoteId={setEditingNoteId}
       />
-      <CompanyNoteList
+      <NoteList
         notes={(notesData?.data as INotes[]) || []}
         client={client?.data?.[0]}
         editingNoteId={editingNoteId}
@@ -93,7 +116,7 @@ export const NotesSection: FC<Props> = ({ style }) => {
   );
 };
 
-export const CompanyNoteForm = ({
+export const NoteForm = ({
   client,
   clientAuthData,
   editingNoteId,
@@ -194,7 +217,7 @@ export const CompanyNoteForm = ({
   );
 };
 
-export const CompanyNoteList = ({
+export const NoteList = ({
   notes,
   client,
   editingNoteId,

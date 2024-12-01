@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useList, useOne, useUpdate } from "@refinedev/core";
+import { useOne } from "@refinedev/core";
 import {
   BankOutlined,
   CalendarOutlined,
@@ -15,7 +15,7 @@ import moment from "moment";
 import PhoneInput from "react-phone-input-2";
 
 import { capitalizeWords } from "@/utilities";
-import { IClient, INotes } from "@/types/client";
+import { IClient } from "@/types/client";
 import { SingleElementForm, Text } from "@/components";
 
 export const InfoForm = () => {
@@ -41,25 +41,6 @@ export const InfoForm = () => {
     },
   });
 
-  const { data: notesData } = useList<INotes>({
-    resource: "notes",
-    filters: [
-      {
-        field: "user_id",
-        operator: "eq",
-        value: id,
-      },
-    ],
-  });
-
-  const { mutate: updateNotes } = useUpdate({
-    resource: "notes",
-    mutationOptions: {
-      onSuccess: () => {},
-      onError: () => {},
-    },
-  });
-
   const {
     address,
     contact,
@@ -70,8 +51,6 @@ export const InfoForm = () => {
     name,
     nationality,
   } = client?.data || {};
-
-  const [currentName, setCurrentName] = useState<string | undefined>(name);
 
   const getActiveForm = (args: { formName: keyof IClient }) => {
     const { formName } = args;
@@ -85,25 +64,6 @@ export const InfoForm = () => {
     }
 
     return "view";
-  };
-
-  const handleUpdateName = async (newName: string) => {
-    if (notesData?.data) {
-      const updatePromises = notesData.data.map((note) =>
-        updateNotes({
-          resource: "notes",
-
-          id: note.id,
-          values: { created_by: newName },
-        })
-      );
-
-      try {
-        await Promise.all(updatePromises);
-      } catch (error) {
-        console.error("Error updating notes:", error);
-      }
-    }
   };
 
   return (
@@ -131,18 +91,12 @@ export const InfoForm = () => {
         }}
         view={<Text>{name}</Text>}
         onClick={() => setActiveForm("name")}
-        onUpdate={() => {
-          handleUpdateName(currentName || "");
-          setActiveForm(undefined);
-        }}
+        onUpdate={() => setActiveForm(undefined)}
         onCancel={() => setActiveForm(undefined)}
       >
         <Input
           autoFocus
           defaultValue={name}
-          onChange={(e) => {
-            setCurrentName(e.target.value);
-          }}
           style={{
             width: "100%",
           }}
