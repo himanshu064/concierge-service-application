@@ -15,6 +15,19 @@ export interface IClient {
   role: TRoles;
 }
 
+export interface IInvitesRecord{
+  id: string;
+  name: string;
+  email: string;
+  date_of_birth?: string;
+  contact?: string;
+  address?: string;
+  gender?: string;
+  nationality?: string;
+  token? : string;
+  expires_at? : string;
+}
+
 export interface INotes {
   id?: string;
   text?: string;

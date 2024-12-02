@@ -27,8 +27,10 @@ import { ClientCreate } from "./pages/clients/create";
 import { ClientEditPage } from "./pages/clients/edit";
 
 import "react-phone-input-2/lib/style.css";
-import { TeamOutlined } from "@ant-design/icons";
+import { IdcardOutlined, TeamOutlined } from "@ant-design/icons";
 import { RegisterPage } from "./components/RegisterPage";
+import { InvitationList } from "./pages/clientInvites/list";
+import AcceptInvite from "./pages/accept-invite/accept-invite";
 
 function App() {
   // useEffect(() => {
@@ -53,6 +55,14 @@ function App() {
               meta: {
                 canDelete: true,
                 icon: <TeamOutlined />,
+              },
+            },
+            {
+              name: "invites",
+              list: "/invites",
+              meta: {
+                canDelete: true,
+                icon: <IdcardOutlined />,
               },
             },
           ]}
@@ -90,6 +100,9 @@ function App() {
                 <Route path="create" element={<ClientCreate />} />
                 <Route path="edit/:id" element={<ClientEditPage />} />
               </Route>
+              <Route path="/invites">
+                <Route index element={<InvitationList />} />
+              </Route>
               <Route path="*" element={<ErrorComponent />} />
             </Route>
             <Route
@@ -120,6 +133,7 @@ function App() {
                 path="/forgot-password"
                 element={<AuthPage type="forgotPassword" />}
               />
+              <Route path="accept-invite" element={<AcceptInvite />} />
             </Route>
           </Routes>
 

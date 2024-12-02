@@ -1,14 +1,73 @@
+import { generateInviteLink, sendInviteEmail } from "@/services/auth";
 import { Create, useForm } from "@refinedev/antd";
-import { Form, Input, DatePicker } from "antd";
+import { useCreate } from "@refinedev/core";
+import { Form, Input, DatePicker, notification, Select } from "antd";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 export const ClientCreate = () => {
-  const { formProps, saveButtonProps  } = useForm({
-   
+  const { formProps, saveButtonProps } = useForm({});
+  const { mutate } = useCreate({
+    resource: "invites",
+    
   });
+  const navigate = useNavigate();
+
+  const handleSave = async (values) => {
+    // Generate a unique token
+    const token = uuidv4();
+
+    // Set token expiration (e.g., 1 hours from now)
+    const expires_at = new Date();
+    console.log({expires_at});
+    
+    expires_at.setHours(expires_at.getHours() + 6.5);
+    console.log({expires_at});
+    const clientInfo = {
+      ...values,
+      token: token,
+      expires_at: expires_at,
+    };
+    try {
+      await mutate(
+        { values: clientInfo },
+        {
+          onSuccess: async () => {
+            formProps.form?.resetFields(); // Reset the form
+            const inviteLink = await generateInviteLink({token:token});
+            console.log(inviteLink,"inviteLink");
+            await sendInviteEmail({email:values.email, inviteLink: inviteLink || ""});
+            navigate("/clients"); // Navigate to the clients page
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      notification.error({
+        message: "Unexpected Error",
+        description: "An unexpected error occurred. Please try again later.",
+      });
+    }
+
+  };
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
-      <Form {...formProps} layout="vertical">
+    <Create
+      saveButtonProps={{
+        ...saveButtonProps,
+        onClick: () => formProps.form?.submit(),
+      }}
+    >
+      <Form
+        {...formProps}
+        layout="vertical"
+        onFinish={handleSave}
+        form={formProps.form}
+        onValuesChange={() => {
+          // Manually clear the browser's "unsaved changes" flag
+          window.onbeforeunload = null;
+        }}
+      >
         {/* Name Field */}
         <Form.Item
           label={"Name"}
@@ -91,11 +150,15 @@ export const ClientCreate = () => {
           rules={[
             {
               required: true,
-              message: "Please enter the gender",
+              message: "Please select the gender",
             },
           ]}
         >
-          <Input placeholder="Enter client's gender" />
+          <Select placeholder="Select client's gender">
+            <Select.Option value="male">Male</Select.Option>
+            <Select.Option value="female">Female</Select.Option>
+            <Select.Option value="others">Rather not say</Select.Option>
+          </Select>
         </Form.Item>
 
         {/* Nationaliy */}
