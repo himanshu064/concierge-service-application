@@ -3,6 +3,7 @@ import {
   BaseRecord,
   CrudFilter,
   useDelete,
+  useGetIdentity,
   useUpdate,
 } from "@refinedev/core";
 import {
@@ -18,21 +19,30 @@ import { Space, Table, Button, Tabs, Popconfirm, Tooltip } from "antd";
 import { StatusTag } from "@/components";
 import TabPane from "antd/es/tabs/TabPane";
 import { useCallback, useEffect } from "react";
+import ENV from "@/env";
+import { isUserAdmin } from "@/utilities";
+import { IClient } from "@/types/client";
+
+const { ADMIN_ACCOUNTS } = ENV;
 
 export const ClientList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { mutate } = useDelete();
+  const { data: user } = useGetIdentity<IClient>();
   const { mutate: updateStatus } = useUpdate();
 
   const urlParams = new URLSearchParams(location.search);
   const initialTab = urlParams.get("tab") || "all";
 
-  const { tableProps, setFilters } = useTable({
+  const { tableProps, setFilters, setSorters } = useTable({
     syncWithLocation: true,
     filters: {
       defaultBehavior: "replace",
       initial: [],
+    },
+    sorters: {
+      initial: [{ field: "created_at", order: "desc" }],
     },
   });
 
@@ -52,30 +62,37 @@ export const ClientList = () => {
   const handleTabChange = useCallback(
     (key: string) => {
       navigate(`?tab=${key}`, { replace: true });
-
-      let filters: CrudFilter[] = [];
+      const filters: CrudFilter[] = [
+        {
+          field: "email",
+          operator: "ncontains",
+          value: ADMIN_ACCOUNTS,
+        },
+      ];
 
       switch (key) {
         case "all":
-          filters = [
-            {
-              field: "is_authorized",
-              operator: "in",
-              value: ["approved", "pending"],
-            },
-          ];
+          filters.push({
+            field: "is_authorized",
+            operator: "in",
+            value: ["approved", "pending"],
+          });
           break;
 
         case "approved":
-          filters = [
-            { field: "is_authorized", operator: "eq", value: "approved" },
-          ];
+          filters.push({
+            field: "is_authorized",
+            operator: "eq",
+            value: "approved",
+          });
           break;
 
         case "pending":
-          filters = [
-            { field: "is_authorized", operator: "eq", value: "pending" },
-          ];
+          filters.push({
+            field: "is_authorized",
+            operator: "eq",
+            value: "pending",
+          });
           break;
 
         default:
@@ -97,6 +114,7 @@ export const ClientList = () => {
         {
           onSuccess: () => {
             console.log("Status successfully approved.");
+            setSorters([{ field: "is_authorized", order: "desc" }]);
           },
           onError: (error) => {
             console.error("Failed to approve status:", error);
@@ -149,25 +167,27 @@ export const ClientList = () => {
                   disabled={record.is_authorized === "pending"}
                 />
               </Tooltip>
-              <Tooltip title={"Delete"} placement="top">
-                <Popconfirm
-                  title="Delete this user"
-                  description="Are you sure to delete this user?"
-                  onConfirm={() => {
-                    handleDelete(record);
-                  }}
-                  okText="Delete"
-                  cancelText="Cancel"
-                  icon={<QuestionCircleOutlined style={{ color: "red" }} />}
-                >
-                  <Button
-                    icon={<DeleteOutlined style={{ color: "#f00" }} />}
-                    size="small"
-                    style={{ borderColor: "#f00" }}
-                  />
-                </Popconfirm>
-              </Tooltip>
-              {record.is_authorized === "pending" && (
+              {isUserAdmin(user) && (
+                <Tooltip title={"Delete"} placement="top">
+                  <Popconfirm
+                    title="Delete this user"
+                    description="Are you sure to delete this user?"
+                    onConfirm={() => {
+                      handleDelete(record);
+                    }}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                  >
+                    <Button
+                      icon={<DeleteOutlined style={{ color: "#f00" }} />}
+                      size="small"
+                      style={{ borderColor: "#f00" }}
+                    />
+                  </Popconfirm>
+                </Tooltip>
+              )}
+              {record.is_authorized === "pending" && isUserAdmin(user) && (
                 <Tooltip
                   title={record.is_authorized === "pending" ? "Approve" : ""}
                   placement="top"
