@@ -9,7 +9,6 @@ export const ClientCreate = () => {
   const { formProps, saveButtonProps } = useForm({});
   const { mutate } = useCreate({
     resource: "invites",
-    
   });
   const navigate = useNavigate();
 
@@ -19,10 +18,8 @@ export const ClientCreate = () => {
 
     // Set token expiration (e.g., 1 hours from now)
     const expires_at = new Date();
-    console.log({expires_at});
-    
+
     expires_at.setHours(expires_at.getHours() + 6.5);
-    console.log({expires_at});
     const clientInfo = {
       ...values,
       token: token,
@@ -34,9 +31,11 @@ export const ClientCreate = () => {
         {
           onSuccess: async () => {
             formProps.form?.resetFields(); // Reset the form
-            const inviteLink = await generateInviteLink({token:token});
-            console.log(inviteLink,"inviteLink");
-            await sendInviteEmail({email:values.email, inviteLink: inviteLink || ""});
+            const inviteLink = await generateInviteLink({ token: token });
+            await sendInviteEmail({
+              email: values.email,
+              inviteLink: inviteLink || "",
+            });
             navigate("/clients"); // Navigate to the clients page
           },
         }
@@ -48,7 +47,6 @@ export const ClientCreate = () => {
         description: "An unexpected error occurred. Please try again later.",
       });
     }
-
   };
 
   return (

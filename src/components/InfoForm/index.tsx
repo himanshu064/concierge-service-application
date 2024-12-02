@@ -7,6 +7,7 @@ import {
   EnvironmentOutlined,
   MailOutlined,
   PhoneOutlined,
+  PlayCircleOutlined,
   ShopOutlined,
 } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
@@ -17,6 +18,7 @@ import PhoneInput from "react-phone-input-2";
 import { capitalizeWords } from "@/utilities";
 import { IClient } from "@/types/client";
 import { SingleElementForm, Text } from "@/components";
+import { StatusElementForm } from "@/components";
 
 export const InfoForm = () => {
   const id = useParams().id;
@@ -249,6 +251,13 @@ export const InfoForm = () => {
           }}
         />
       </SingleElementForm>
+      <StatusElementForm
+        icon={<PlayCircleOutlined />}
+        itemProps={{ label: "Status" }}
+        state="view"
+        data={client?.data}
+        loading={isLoading}
+      />
     </Card>
   );
 };
