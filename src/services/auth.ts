@@ -61,7 +61,7 @@ export const getUserAuthStatus = async ({ email }: { email: string }) => {
 export const generateInviteLink = async ({ token }: { token: string }) => {
   try {
     // Generate the invite link
-    const inviteLink = `${ENV.REACT_APP_URL}/accept-invite?token=${token}`;
+    const inviteLink = `${new URL(window.location.href).origin}/accept-invite?token=${token}`;
     return inviteLink;
   } catch (error) {
     console.error("Error generating invite link:", error);
