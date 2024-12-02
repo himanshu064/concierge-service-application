@@ -1,12 +1,12 @@
 import { supabaseClient } from "@/lib/supbaseClient";
-import { IContact } from "@/types/client";
+import { IClient } from "@/types/client";
 
 export const fetchSpecificClientDetailsByClientId = async (
   clientId: string,
   fields: string
-): Promise<{ data: IContact[] | null; error: Error | null }> => {
+): Promise<{ data: IClient[] | null; error: Error | null }> => {
   if (!clientId) {
-    throw new Error("Company ID is required to fetch clients.");
+    throw new Error("Client ID is required to fetch clients.");
   }
 
   try {
@@ -20,7 +20,7 @@ export const fetchSpecificClientDetailsByClientId = async (
       return { data: null, error };
     }
 
-    return { data: data as unknown as IContact[], error: null };
+    return { data: data as unknown as IClient[], error: null };
   } catch (err) {
     console.error("Unexpected error fetching clients:", err);
     return {
@@ -32,7 +32,7 @@ export const fetchSpecificClientDetailsByClientId = async (
 
 export const fetchClientDetailsByClientId = async (clientId: string) => {
   if (!clientId) {
-    throw new Error("Company ID is required to fetch clients.");
+    throw new Error("Client ID is required to fetch clients.");
   }
 
   try {
@@ -55,7 +55,7 @@ export const fetchClientDetailsByClientId = async (clientId: string) => {
 
 export const fetchNotesOfAClient = async (clientId: string) => {
   if (!clientId) {
-    throw new Error("Company ID is required to fetch clients.");
+    throw new Error("Client ID is required to fetch clients.");
   }
 
   try {
@@ -79,7 +79,7 @@ export const fetchNotesOfAClient = async (clientId: string) => {
 
 export const deleteNoteOfAClient = async (noteId?: string) => {
   if (!noteId) {
-    throw new Error("Company ID is required to fetch clients.");
+    throw new Error("Client ID is required to fetch clients.");
   }
 
   try {
@@ -102,7 +102,7 @@ export const deleteNoteOfAClient = async (noteId?: string) => {
 
 export const updateNoteOfAClient = async (text?: string, noteId?: string) => {
   if (!noteId) {
-    throw new Error("Company ID is required to fetch clients.");
+    throw new Error("Client ID is required to fetch clients.");
   }
 
   try {

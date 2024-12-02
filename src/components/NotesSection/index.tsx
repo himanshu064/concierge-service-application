@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm } from "@refinedev/antd";
 import {
@@ -18,7 +18,6 @@ import {
   useList,
   useDelete,
   useUpdate,
-  useOne,
 } from "@refinedev/core";
 import dayjs from "dayjs";
 
@@ -68,28 +67,6 @@ export const NotesSection: FC<Props> = ({ style }) => {
     ],
   });
 
-  useEffect(() => {
-    const fetchClients = async () => {
-      const clients = await Promise.all(
-        notes.map(async (note) => {
-          if (note.user_id) {
-            const { data } = await useOne<IClient>({
-              resource: "clients",
-              id: note.user_id,
-            });
-            return data;
-          }
-          return null;
-        })
-      );
-      setNoteClients(clients.filter((client) => client !== null) as IClient[]);
-    };
-
-    if (notes.length) {
-      fetchClients();
-    }
-  }, [notes]);
-
   return (
     <Card
       title={
@@ -127,7 +104,7 @@ export const NoteForm = ({
   editingNoteId: string | null;
   setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
-  const { id: companyId } = useParams();
+  const { id: clientId } = useParams();
   const [loading, setLoading] = useState(false);
   const { mutate: addNote } = useCreate();
   const { mutate: updateNote } = useUpdate();
@@ -138,7 +115,7 @@ export const NoteForm = ({
     redirect: false,
     mutationMode: "optimistic",
     successNotification: () => ({
-      key: "company-note",
+      key: "client-note",
       message: editingNoteId
         ? "Successfully updated note"
         : "Successfully added note",
@@ -148,7 +125,7 @@ export const NoteForm = ({
   });
 
   const handleOnFinish = async (values: INotes) => {
-    if (!companyId || !values?.text?.trim()) {
+    if (!clientId || !values?.text?.trim()) {
       return;
     }
     setLoading(true);
@@ -163,8 +140,8 @@ export const NoteForm = ({
         await addNote({
           resource: "notes",
           values: {
-            created_by: client?.name,
-            user_id: client?.id,
+            created_by: client?.id,
+            user_id: clientId,
             text: values.text.trim(),
             created_at: new Date().toISOString(),
           },
@@ -219,7 +196,7 @@ export const NoteForm = ({
 
 export const NoteList = ({
   notes,
-  client,
+  // client,
   editingNoteId,
   setEditingNoteId,
 }: {
@@ -228,9 +205,16 @@ export const NoteList = ({
   editingNoteId: string | null;
   setEditingNoteId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
-  // const { id } = useParams();
   const { mutate: deleteNote } = useDelete();
   const { mutate: updateNote } = useUpdate();
+  const { data: clientsData } = useList({ resource: "clients" });
+
+  const mergedNotes = notes?.map((note) => {
+    const matchedClient = clientsData?.data.find(
+      (client) => client.id === note.created_by
+    );
+    return { ...note, client: matchedClient };
+  });
 
   return (
     <Space
@@ -243,13 +227,13 @@ export const NoteList = ({
         width: "100%",
       }}
     >
-      {notes?.map((item) => {
-        const isMe = client?.id === item.user_id;
+      {mergedNotes?.map((item) => {
+        // const isMe = client?.id === item.user_id;
         return (
           <div key={item.id} style={{ display: "flex", gap: "12px" }}>
             <CustomAvatar
               style={{ flexShrink: 0 }}
-              name={item.created_by}
+              name={item.client?.name}
               src={""}
             />
             <div
@@ -267,7 +251,7 @@ export const NoteList = ({
                   alignItems: "center",
                 }}
               >
-                <Text style={{ fontWeight: 500 }}>{item?.created_by}</Text>
+                <Text style={{ fontWeight: 500 }}>{item?.client?.name}</Text>
                 <Text size="xs" style={{ color: "#000000a6" }}>
                   {dayjs(item.created_at).format("MMMM D, YYYY - h:ma")}
                 </Text>
@@ -335,7 +319,7 @@ export const NoteList = ({
                 </Typography.Paragraph>
               )}
 
-              {isMe && editingNoteId !== item.id && (
+              {editingNoteId !== item.id && (
                 <Space size={16}>
                   <Typography.Link
                     type="secondary"

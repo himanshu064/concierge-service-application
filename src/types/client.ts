@@ -32,6 +32,6 @@ export type TTitleInputProps = {
 
 export type TAuthorizedStatus = "approved" | "pending";
 
-export type TCompanySize = "male" | "female" | "others";
+export type TGenderType = "male" | "female" | "others";
 
 export type TRegisterType = "self" | "invited";

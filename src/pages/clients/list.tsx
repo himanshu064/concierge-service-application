@@ -1,11 +1,15 @@
-import { DeleteButton, EditButton, List, useTable } from "@refinedev/antd";
-import { Space, Table } from "antd";
+import { DeleteButton, List, useTable } from "@refinedev/antd";
+import { Space, Table, Button } from "antd";
 import { BaseRecord } from "@refinedev/core";
+import { EyeOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 export const ClientList = () => {
   const { tableProps } = useTable({
     syncWithLocation: true,
   });
+
+  const navigate = useNavigate();
 
   return (
     <List>
@@ -19,7 +23,12 @@ export const ClientList = () => {
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
             <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
+              <Button
+                icon={<EyeOutlined />}
+                size="small"
+                onClick={() => navigate(`/clients/edit/${record.id}`)}
+              />
+              {/* <EditButton hideText size="small" recordItemId={record.id} /> */}
               <DeleteButton hideText size="small" recordItemId={record.id} />
             </Space>
           )}
