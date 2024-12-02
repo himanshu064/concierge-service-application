@@ -27,7 +27,7 @@ import { ClientCreate } from "./pages/clients/create";
 import { ClientEditPage } from "./pages/clients/edit";
 
 import "react-phone-input-2/lib/style.css";
-import { ContainerOutlined, IdcardOutlined, TeamOutlined } from "@ant-design/icons";
+import { IdcardOutlined, TeamOutlined } from "@ant-design/icons";
 import { RegisterPage } from "./components/RegisterPage";
 import { InvitationList } from "./pages/clientInvites/list";
 import AcceptInvite from "./pages/accept-invite/accept-invite";
@@ -48,11 +48,11 @@ function App() {
           routerProvider={routerBindings}
           resources={[
             {
-              name:"Clients",
-              meta:{
+              name: "Clients",
+              meta: {
                 canDelete: true,
                 icon: <TeamOutlined />,
-              }
+              },
             },
             {
               name: "clients",
@@ -60,9 +60,9 @@ function App() {
               create: "/clients/create",
               edit: "/clients/edit/:id",
               meta: {
-                label:"View Clients",
+                label: "View Clients",
                 canDelete: true,
-                icon: <ContainerOutlined />,
+                icon: <TeamOutlined />,
                 parent: "Clients",
               },
             },

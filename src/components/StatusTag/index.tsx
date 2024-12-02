@@ -1,43 +1,22 @@
 import React from "react";
 import {
   CheckCircleOutlined,
-  MinusCircleOutlined,
-  PlayCircleFilled,
-  PlayCircleOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { Tag, type TagProps } from "antd";
 
-export const StatusTag = ({ status }: { status: any }) => {
+export const StatusTag = ({ status }: { status: string }) => {
   let icon: React.ReactNode = null;
   let color: TagProps["color"] = undefined;
 
   switch (status) {
-    case "NEW":
-    case "CONTACTED":
-    case "INTERESTED":
-      icon = <PlayCircleOutlined />;
-      color = "cyan";
+    case "pending":
+      icon = <ExclamationCircleOutlined />;
+      color = "orange";
       break;
-    case "UNQUALIFIED":
-      icon = <PlayCircleOutlined />;
-      color = "red";
-      break;
-    case "QUALIFIED":
-    case "NEGOTIATION":
-      icon = <PlayCircleFilled />;
-      color = "green";
-      break;
-    case "LOST":
-      icon = <PlayCircleFilled />;
-      color = "red";
-      break;
-    case "WON":
+    case "approved":
       icon = <CheckCircleOutlined />;
       color = "green";
-      break;
-    case "CHURNED":
-      icon = <MinusCircleOutlined />;
-      color = "red";
       break;
 
     default:

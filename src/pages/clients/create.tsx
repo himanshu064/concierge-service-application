@@ -24,7 +24,6 @@ const { formProps, saveButtonProps } = useForm<IInvitesRecord>();
     const expires_at = new Date();
 
     expires_at.setHours(expires_at.getHours() + 6.5);
-
     const clientInfo = {
       ...values,
       token: token,
