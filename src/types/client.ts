@@ -16,18 +16,21 @@ export interface IClient {
 }
 
 export interface IInvitesRecord{
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
   email: string;
   date_of_birth?: string;
   contact?: string;
   address?: string;
   gender?: string;
   nationality?: string;
-  token? : string;
-  expires_at? : string;
+  token?: string;
+  expires_at?: string;
 }
-
+export interface IRegister{
+  email:string;
+  password: string;
+}
 export interface INotes {
   id?: string;
   text?: string;

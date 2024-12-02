@@ -34,14 +34,15 @@ export const RegisterPage = () => {
                       id="name"
                       name="name"
                       type="text"
-                      className="ant-input ant-input-lg ant-input-outlined"
+                      className="ant-input ant-input-lg ant-input-outlined nameInput"
                       placeholder="Enter your name"
                       style={{
                         width: "100%",
-                        padding: "8px",
+                        padding: "11px",
                         margin: "8px 0",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        border: "1px solid #d9d9d9",
+                        fontSize:"15px",
                       }}
                     />
                   </div>
