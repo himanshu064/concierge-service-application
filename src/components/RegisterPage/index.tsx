@@ -2,8 +2,11 @@ import { AuthPage } from "@refinedev/antd";
 import React from "react";
 
 import authProvider from "@/lib/authProvider";
+import { useNavigate } from "react-router-dom";
 
 export const RegisterPage = () => {
+  const navigate = useNavigate();
+
   return (
     <AuthPage
       type="register"
@@ -17,7 +20,9 @@ export const RegisterPage = () => {
           const nameElement = document.querySelectorAll(
             "#register-form #name"
           )[0] as HTMLInputElement;
-          authProvider.register?.({ name: nameElement.value, ...values });
+          authProvider.register?.({ name: nameElement.value, ...values }).then(()=>{
+            navigate("/login");
+          })
         },
       }}
       renderContent={(content: React.ReactNode) => {

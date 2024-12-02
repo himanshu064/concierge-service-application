@@ -175,12 +175,7 @@ const authProvider: AuthBindings = {
 
       return {
         success: true,
-        redirectTo: "/",
-        successNotification: {
-          message:
-            "You will be able log in once the admin approves your account.",
-          description: "Registration Successful",
-        },
+        redirectTo: "/login",
       };
     } catch (error: any) {
       // Handle unexpected errors
