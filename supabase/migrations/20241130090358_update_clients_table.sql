@@ -1,0 +1,3 @@
+ALTER TABLE clients
+ALTER COLUMN date_of_birth TYPE TIMESTAMPTZ
+USING date_of_birth::TIMESTAMPTZ;

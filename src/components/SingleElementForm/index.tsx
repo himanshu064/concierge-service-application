@@ -1,13 +1,12 @@
 import React from "react";
 
-import type { UseFormProps } from "@refinedev/antd";
 import { useForm } from "@refinedev/antd";
-
-import { EditOutlined } from "@ant-design/icons";
-import type { FormItemProps, FormProps } from "antd";
 import { Button, Form, Skeleton } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import type { UseFormProps } from "@refinedev/antd";
+import type { FormItemProps, FormProps } from "antd";
 
-import { Text } from "../text";
+import { Text } from "@/components";
 import styles from "./index.module.css";
 
 type SingleElementFormProps = {

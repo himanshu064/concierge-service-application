@@ -1,15 +1,13 @@
 export { AppIcon } from "./AppIcon";
 export { Header } from "./Header";
-export * from "./contacts-table";
-export * from "./custom-avatar";
-export * from "./deals-table";
-export * from "./info-form";
-export * from "./notes";
-export * from "./quotes-table";
-export * from "./title-form";
-export * from "./queue-status-tag";
-export * from "./contact-status-tag";
-export * from "./select-optiom-with-avatar";
-export * from "./single-element-form";
-export * from "./text";
-export * from "./icon";
+
+export * from "./ClientDocumentsTable";
+export * from "./CurrentUser";
+export * from "./CustomAvatar";
+export * from "./InfoForm";
+export * from "./NotesSection";
+export * from "./SingleElementForm";
+export * from "./StatusTag";
+export * from "./Text";
+export * from "./TextIcon";
+export * from "./TitleForm";
