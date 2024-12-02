@@ -1,6 +1,7 @@
-import authProvider from "@/lib/authProvider";
 import { AuthPage } from "@refinedev/antd";
 import React from "react";
+
+import authProvider from "@/lib/authProvider";
 
 export const RegisterPage = () => {
   return (
@@ -16,16 +17,13 @@ export const RegisterPage = () => {
           const nameElement = document.querySelectorAll(
             "#register-form #name"
           )[0] as HTMLInputElement;
-          authProvider.register?.({name: nameElement.value, ...values });
+          authProvider.register?.({ name: nameElement.value, ...values });
         },
       }}
-    
       renderContent={(content: React.ReactNode) => {
-        // Check if content is a ReactElement
         if (React.isValidElement(content)) {
-          // Explicitly type content as React.ReactElement
           const clonedContent = React.cloneElement(
-            content as React.ReactElement, // Explicit type cast
+            content as React.ReactElement,
             {
               children: (
                 <>
@@ -67,8 +65,6 @@ export const RegisterPage = () => {
             </div>
           );
         }
-
-        // If content is not a ReactElement, render it as-is
         return content;
       }}
     />

@@ -44,7 +44,6 @@ export const registerUser = async ({
 
 // Function to get user authorization status by email id form clients table
 export const getUserAuthStatus = async ({ email }: { email: string }) => {
-  console.log(email, "email");
   const { data: existingUser, error: fetchError } = await supabaseClient
     .from("clients")
     .select("is_authorized")
