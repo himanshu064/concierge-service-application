@@ -4,24 +4,27 @@ import { useCreate } from "@refinedev/core";
 import { Form, Input, DatePicker, notification, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css"; // Optional: Import the styles for the phone input
+import { IInvitesRecord } from "@/types/client";
 
 export const ClientCreate = () => {
-  const { formProps, saveButtonProps } = useForm({});
+const { formProps, saveButtonProps } = useForm<IInvitesRecord>();
+
   const { mutate } = useCreate({
     resource: "invites",
-    
   });
   const navigate = useNavigate();
 
-  const handleSave = async (values) => {
+  const handleSave = async (values: IInvitesRecord) => {
     // Generate a unique token
     const token = uuidv4();
 
     // Set token expiration (e.g., 1 hours from now)
     const expires_at = new Date();
-    
+
     expires_at.setHours(expires_at.getHours() + 6.5);
-  
+
     const clientInfo = {
       ...values,
       token: token,
@@ -33,8 +36,11 @@ export const ClientCreate = () => {
         {
           onSuccess: async () => {
             formProps.form?.resetFields(); // Reset the form
-            const inviteLink = await generateInviteLink({token:token});
-            await sendInviteEmail({email:values.email, inviteLink: inviteLink || ""});
+            const inviteLink = await generateInviteLink({ token: token });
+            await sendInviteEmail({
+              email: values.email,
+              inviteLink: inviteLink || "",
+            });
             navigate("/clients"); // Navigate to the clients page
           },
         }
@@ -46,7 +52,6 @@ export const ClientCreate = () => {
         description: "An unexpected error occurred. Please try again later.",
       });
     }
-
   };
 
   return (
@@ -104,15 +109,19 @@ export const ClientCreate = () => {
               required: true,
               message: "Please enter the contact number",
             },
-            {
-              pattern: /^[0-9]+$/,
-              message: "Contact number must be numeric",
-            },
           ]}
         >
-          <Input placeholder="Enter client's contact number" />
+          <div className="phone-input-container">
+            <PhoneInput
+              country={"us"} // Default country code, can be dynamically set
+              value={formProps.form?.getFieldValue(["contact"])} // Make sure form data is synced
+              onChange={(value) =>
+                formProps.form?.setFieldValue(["contact"], value)
+              } // Update form state
+              placeholder="Enter client's contact number"
+            />
+          </div>
         </Form.Item>
-
         {/* Address Field */}
         <Form.Item
           label={"Address"}

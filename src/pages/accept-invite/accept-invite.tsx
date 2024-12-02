@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
-import { Form, Input, Button, Card } from "antd";
+import { Form, Input, Button, Card, notification } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Text } from "@/components";
 import { getUserFromInvites } from "@/services/auth";
 import Loader from "@/components/Loader";
 import { supabaseClient } from "@/lib/supbaseClient";
 import { useCreate, useDelete } from "@refinedev/core";
-import { IClient } from "@/types/client";
+import { IClient, IRegister } from "@/types/client";
 
 const AcceptInvite: React.FC = () => {
   const [form] = Form.useForm();
@@ -42,7 +42,7 @@ const AcceptInvite: React.FC = () => {
     }
   }, [searchParams]);
 
-  const handleSignup = async (values: any) => {
+  const handleSignup = async (values: IRegister) => {
     try {
       const res = await supabaseClient.auth.signUp({
         email: values?.email,
@@ -53,7 +53,7 @@ const AcceptInvite: React.FC = () => {
         throw new Error(res.error.message);
       }
 
-      const auth_id = res.data.user.id;
+      const auth_id = res.data.user?.id;
 
       createClient(
         {
@@ -71,8 +71,13 @@ const AcceptInvite: React.FC = () => {
           },
         },
         {
-          onError: (error) => {
-            console.error("Error creating client:", error);
+          onError: () => {
+          },
+          onSuccess: () => {
+            notification.success({
+              description: "Your account has been verified successfully.",
+              message: "Verification Successfull",
+            });
           },
         }
       );
@@ -80,12 +85,11 @@ const AcceptInvite: React.FC = () => {
       deleteInvite(
         {
           resource: "invites",
-          id: userData.id,
+          id: userData?.id || "",
         },
         {
-          onError: (error) => {
-            console.error("Error deleting invite:", error);
-          },
+          onError: () => {},
+          onSuccess: () => {},
         }
       );
 
@@ -145,7 +149,7 @@ const AcceptInvite: React.FC = () => {
                   rules={[
                     { required: true, message: "Please enter your password" },
                     {
-                      min: 8,
+                      min: 6,
                       message: "Password must be at least 8 characters long",
                     },
                   ]}
@@ -183,9 +187,9 @@ const AcceptInvite: React.FC = () => {
         </>
       ) : (
         <>
-        <div className="token-expired-page">
+          <div className="token-expired-page">
             <h2>Invalid Token or Expired !</h2>
-        </div>
+          </div>
         </>
       )}
     </>

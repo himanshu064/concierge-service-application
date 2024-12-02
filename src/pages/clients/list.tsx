@@ -1,8 +1,13 @@
-import { DeleteButton, List, useTable } from "@refinedev/antd";
-import { Space, Table, Button } from "antd";
-import { BaseRecord } from "@refinedev/core";
-import { EyeOutlined } from "@ant-design/icons";
+import { List, useTable } from "@refinedev/antd";
+import { Space, Table, Button, Popconfirm } from "antd";
+import { BaseKey, BaseRecord, useDelete } from "@refinedev/core";
+import {
+  DeleteOutlined,
+  EyeOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import supabaseAdmin from "@/lib/supabaseAdmin";
 
 export const ClientList = () => {
   const { tableProps } = useTable({
@@ -10,6 +15,23 @@ export const ClientList = () => {
   });
 
   const navigate = useNavigate();
+  const { mutate } = useDelete();
+
+  const handleDelete = async (record: BaseRecord) => {
+
+    try {
+      
+      await supabaseAdmin.auth.admin.deleteUser(record.auth_id);
+
+      mutate({
+        resource: "clients",
+        id: record.id as BaseKey,
+      });
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <List>
@@ -28,8 +50,23 @@ export const ClientList = () => {
                 size="small"
                 onClick={() => navigate(`/clients/edit/${record.id}`)}
               />
-              {/* <EditButton hideText size="small" recordItemId={record.id} /> */}
-              <DeleteButton hideText size="small" recordItemId={record.id} />
+
+              <Popconfirm
+                title="Delete this user"
+                description="Are you sure to delete this user?"
+                onConfirm={() => {
+                  handleDelete(record);
+                }}
+                okText="Delete"
+                cancelText="Cancle"
+                icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+              >
+                <Button
+                  icon={<DeleteOutlined style={{ color: "#f00" }} />}
+                  size="small"
+                  style={{ borderColor: "#f00" }}
+                />
+              </Popconfirm>
             </Space>
           )}
         />

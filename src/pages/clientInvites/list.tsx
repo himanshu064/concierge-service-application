@@ -1,7 +1,7 @@
 import { IInvitesRecord } from "@/types/client";
 import { List, useTable } from "@refinedev/antd";
 import { useDelete } from "@refinedev/core";
-import { Table, message } from "antd";
+import { Table } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -32,19 +32,16 @@ export const InvitationList = () => {
         mutate(
           {
             resource: "invites",
-            id: record.id,
+            id: record?.id || "",
           },
           {
             onSuccess: () => {
-              message.success(`Deleted expired invite: ${record.email}`);
               // Update filtered data to exclude the deleted record
               setFilteredData((prevData) =>
                 prevData.filter((item) => item.id !== record.id)
               );
             },
-            onError: () => {
-              message.error(`Failed to delete invite: ${record.email}`);
-            },
+            onError: () => {},
           }
         );
       });

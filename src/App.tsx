@@ -27,7 +27,7 @@ import { ClientCreate } from "./pages/clients/create";
 import { ClientEditPage } from "./pages/clients/edit";
 
 import "react-phone-input-2/lib/style.css";
-import { IdcardOutlined, TeamOutlined } from "@ant-design/icons";
+import { ContainerOutlined, IdcardOutlined, TeamOutlined } from "@ant-design/icons";
 import { RegisterPage } from "./components/RegisterPage";
 import { InvitationList } from "./pages/clientInvites/list";
 import AcceptInvite from "./pages/accept-invite/accept-invite";
@@ -48,13 +48,22 @@ function App() {
           routerProvider={routerBindings}
           resources={[
             {
+              name:"Clients",
+              meta:{
+                canDelete: true,
+                icon: <TeamOutlined />,
+              }
+            },
+            {
               name: "clients",
               list: "/clients",
               create: "/clients/create",
               edit: "/clients/edit/:id",
               meta: {
+                label:"View Clients",
                 canDelete: true,
-                icon: <TeamOutlined />,
+                icon: <ContainerOutlined />,
+                parent: "Clients",
               },
             },
             {
@@ -63,6 +72,7 @@ function App() {
               meta: {
                 canDelete: true,
                 icon: <IdcardOutlined />,
+                parent: "Clients",
               },
             },
           ]}
@@ -124,15 +134,16 @@ function App() {
                           password: "",
                         },
                       }}
+                      forgotPasswordLink={<></>}
                     />
                   </div>
                 }
               />
               <Route path="/register" element={<RegisterPage />} />
-              <Route
+              {/* <Route
                 path="/forgot-password"
                 element={<AuthPage type="forgotPassword" />}
-              />
+              /> */}
               <Route path="accept-invite" element={<AcceptInvite />} />
             </Route>
           </Routes>
