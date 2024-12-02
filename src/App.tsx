@@ -36,7 +36,6 @@ function App() {
   // useEffect(() => {
   //   addData();
   // }, []);
-
   return (
     <BrowserRouter>
       <AntdApp>

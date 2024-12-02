@@ -9,7 +9,7 @@ import "react-phone-input-2/lib/style.css"; // Optional: Import the styles for t
 import { IInvitesRecord } from "@/types/client";
 
 export const ClientCreate = () => {
-const { formProps, saveButtonProps } = useForm<IInvitesRecord>();
+  const { formProps, saveButtonProps } = useForm<IInvitesRecord>();
 
   const { mutate } = useCreate({
     resource: "invites",
@@ -148,38 +148,39 @@ const { formProps, saveButtonProps } = useForm<IInvitesRecord>();
         >
           <DatePicker style={{ width: "100%" }} />
         </Form.Item>
+        <div className="create-page-bottom-fields-container">
+          {/* Gender  */}
+          <Form.Item
+            label={"Gender"}
+            name={["gender"]}
+            rules={[
+              {
+                required: true,
+                message: "Please select the gender",
+              },
+            ]}
+          >
+            <Select placeholder="Select client's gender">
+              <Select.Option value="male">Male</Select.Option>
+              <Select.Option value="female">Female</Select.Option>
+              <Select.Option value="others">Rather not say</Select.Option>
+            </Select>
+          </Form.Item>
 
-        {/* Gender  */}
-        <Form.Item
-          label={"Gender"}
-          name={["gender"]}
-          rules={[
-            {
-              required: true,
-              message: "Please select the gender",
-            },
-          ]}
-        >
-          <Select placeholder="Select client's gender">
-            <Select.Option value="male">Male</Select.Option>
-            <Select.Option value="female">Female</Select.Option>
-            <Select.Option value="others">Rather not say</Select.Option>
-          </Select>
-        </Form.Item>
-
-        {/* Nationaliy */}
-        <Form.Item
-          label={"Nationality"}
-          name={["nationality"]}
-          rules={[
-            {
-              required: true,
-              message: "Please enter the Nationality",
-            },
-          ]}
-        >
-          <Input placeholder="Enter client's Nationality" />
-        </Form.Item>
+          {/* Nationaliy */}
+          <Form.Item
+            label={"Nationality"}
+            name={["nationality"]}
+            rules={[
+              {
+                required: true,
+                message: "Please enter the Nationality",
+              },
+            ]}
+          >
+            <Input placeholder="Enter client's Nationality" />
+          </Form.Item>
+        </div>
       </Form>
     </Create>
   );
