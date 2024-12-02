@@ -19,12 +19,14 @@ export const ClientCreate = () => {
 
     // Set token expiration (e.g., 1 hours from now)
     const expires_at = new Date();
-    expires_at.setHours(expires_at.getHours() + 1);
-
+    console.log({expires_at});
+    
+    expires_at.setHours(expires_at.getHours() + 6.5);
+    console.log({expires_at});
     const clientInfo = {
       ...values,
       token: token,
-      expires_at: expires_at.toISOString(),
+      expires_at: expires_at,
     };
     try {
       await mutate(

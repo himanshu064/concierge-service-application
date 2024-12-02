@@ -58,6 +58,19 @@ export interface ICompanyInfoFormProps {
   onUpdateCompany?: (updatedCompany: ICompany) => void;
 }
 
+export interface IInvitesRecord{
+  id: string;
+  name: string;
+  email: string;
+  date_of_birth?: string;
+  contact?: string;
+  address?: string;
+  gender?: string;
+  nationality?: string;
+  token? : string;
+  expires_at? : string;
+}
+
 export interface INotes {
   id?: string;
   text?: string;
