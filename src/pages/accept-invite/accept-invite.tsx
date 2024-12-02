@@ -44,7 +44,6 @@ const AcceptInvite: React.FC = () => {
 
   const handleSignup = async (values: any) => {
     try {
-      console.log("Signup Data:", values);
       const res = await supabaseClient.auth.signUp({
         email: values?.email,
         password: values?.password,
@@ -184,9 +183,9 @@ const AcceptInvite: React.FC = () => {
         </>
       ) : (
         <>
-        <div className="token-expired-page">
+          <div className="token-expired-page">
             <h2>Invalid Token or Expired !</h2>
-        </div>
+          </div>
         </>
       )}
     </>

@@ -48,13 +48,22 @@ function App() {
           routerProvider={routerBindings}
           resources={[
             {
+              name: "Clients",
+              meta: {
+                canDelete: true,
+                icon: <TeamOutlined />,
+              },
+            },
+            {
               name: "clients",
               list: "/clients",
               create: "/clients/create",
               edit: "/clients/edit/:id",
               meta: {
+                label: "View Clients",
                 canDelete: true,
                 icon: <TeamOutlined />,
+                parent: "Clients",
               },
             },
             {
@@ -63,6 +72,7 @@ function App() {
               meta: {
                 canDelete: true,
                 icon: <IdcardOutlined />,
+                parent: "Clients",
               },
             },
           ]}
