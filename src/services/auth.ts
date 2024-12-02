@@ -143,7 +143,6 @@ export const sendInviteEmail = async ({
 export const getUserFromInvites = async ({token}:{token: string}) => {
   try {
     const data = await supabaseClient.from("invites").select("*").eq("token",token).single();
-    console.log(data,"data")
     if(data?.data){
       return data?.data;
     }

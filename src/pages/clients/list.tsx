@@ -1,15 +1,28 @@
-import { useCallback, useEffect } from "react";
-import { DeleteButton, List, useTable } from "@refinedev/antd";
-import { Space, Table, Button, Tabs, Tooltip, Popconfirm } from "antd";
-import { BaseRecord, CrudFilter, useUpdate } from "@refinedev/core";
-import { CheckOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  BaseKey,
+  BaseRecord,
+  CrudFilter,
+  useDelete,
+  useUpdate,
+} from "@refinedev/core";
+import {
+  CheckOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import supabaseAdmin from "@/lib/supabaseAdmin";
+import { List, useTable } from "@refinedev/antd";
+import { Space, Table, Button, Tabs, Popconfirm, Tooltip } from "antd";
 import { StatusTag } from "@/components";
 import TabPane from "antd/es/tabs/TabPane";
+import { useCallback, useEffect } from "react";
 
 export const ClientList = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { mutate } = useDelete();
   const { mutate: updateStatus } = useUpdate();
 
   const urlParams = new URLSearchParams(location.search);
@@ -22,6 +35,19 @@ export const ClientList = () => {
       initial: [],
     },
   });
+
+  const handleDelete = async (record: BaseRecord) => {
+    try {
+      await supabaseAdmin.auth.admin.deleteUser(record.auth_id);
+
+      mutate({
+        resource: "clients",
+        id: record.id as BaseKey,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleTabChange = useCallback(
     (key: string) => {
@@ -123,8 +149,23 @@ export const ClientList = () => {
                   disabled={record.is_authorized === "pending"}
                 />
               </Tooltip>
-              <Tooltip title="Delete" placement="top">
-                <DeleteButton hideText size="small" recordItemId={record.id} />
+              <Tooltip title={"Delete"} placement="top">
+                <Popconfirm
+                  title="Delete this user"
+                  description="Are you sure to delete this user?"
+                  onConfirm={() => {
+                    handleDelete(record);
+                  }}
+                  okText="Delete"
+                  cancelText="Cancel"
+                  icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                >
+                  <Button
+                    icon={<DeleteOutlined style={{ color: "#f00" }} />}
+                    size="small"
+                    style={{ borderColor: "#f00" }}
+                  />
+                </Popconfirm>
               </Tooltip>
               {record.is_authorized === "pending" && (
                 <Tooltip
@@ -136,6 +177,7 @@ export const ClientList = () => {
                     onConfirm={() => handleApprove(record.id)}
                     okText="Yes"
                     cancelText="No"
+                    icon={<QuestionCircleOutlined style={{ color: "red" }} />}
                   >
                     <Button
                       type="link"

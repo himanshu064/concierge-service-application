@@ -134,15 +134,16 @@ function App() {
                           password: "",
                         },
                       }}
+                      forgotPasswordLink={<></>}
                     />
                   </div>
                 }
               />
               <Route path="/register" element={<RegisterPage />} />
-              <Route
+              {/* <Route
                 path="/forgot-password"
                 element={<AuthPage type="forgotPassword" />}
-              />
+              /> */}
               <Route path="accept-invite" element={<AcceptInvite />} />
             </Route>
           </Routes>

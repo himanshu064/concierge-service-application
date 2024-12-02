@@ -1,7 +1,7 @@
 import { IInvitesRecord } from "@/types/client";
 import { List, useTable } from "@refinedev/antd";
 import { useDelete } from "@refinedev/core";
-import { Table, message } from "antd";
+import { Table } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -19,16 +19,11 @@ export const InvitationList = () => {
 
   useEffect(() => {
     if (tableProps.dataSource) {
-      const now = new Date(); // Current time
-      console.log(tableProps.dataSource,"tableProps.dataSource")
+      const now = new Date(); 
       // Filter out expired records by comparing timestamps correctly
       const expiredRecords = tableProps.dataSource.filter((record) => {
-        console.log(record,"record");
         // Parse the record's timestamp to a dayjs object for comparison
         const expirationDate = dayjs(record.expires_at);
-        console.log(expirationDate,"expirationDate");
-        console.log(now,"Current Date Now");
-        console.log(expirationDate.isBefore(now),"expirationDate.isBefore(now)");
         return expirationDate.isBefore(now); // Check if the record has expired
       });
 
@@ -37,19 +32,16 @@ export const InvitationList = () => {
         mutate(
           {
             resource: "invites",
-            id: record.id,
+            id: record?.id || "",
           },
           {
             onSuccess: () => {
-              message.success(`Deleted expired invite: ${record.email}`);
               // Update filtered data to exclude the deleted record
               setFilteredData((prevData) =>
                 prevData.filter((item) => item.id !== record.id)
               );
             },
-            onError: () => {
-              message.error(`Failed to delete invite: ${record.email}`);
-            },
+            onError: () => {},
           }
         );
       });
