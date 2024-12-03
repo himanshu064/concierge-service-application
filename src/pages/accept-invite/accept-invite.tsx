@@ -17,6 +17,15 @@ const AcceptInvite: React.FC = () => {
   const navigate = useNavigate();
   const { mutate: createClient } = useCreate({
     resource: "clients",
+    mutationOptions: {
+      onSuccess: () => {
+        notification.success({
+          description: "Your account has been verified successfully.",
+          message: "Verification Successful",
+        });
+      },
+      onError: () => {},
+    },
   });
 
   const { mutate: deleteInvite } = useDelete();
@@ -75,7 +84,7 @@ const AcceptInvite: React.FC = () => {
           onSuccess: () => {
             notification.success({
               description: "Your account has been verified successfully.",
-              message: "Verification Successfull",
+              message: "Verification Successful",
             });
           },
           onError: () => {
@@ -87,10 +96,12 @@ const AcceptInvite: React.FC = () => {
         {
           resource: "invites",
           id: userData?.id || "",
+          errorNotification: false,
+          successNotification: false,
         },
         {
-          onError: () => {},
-          onSuccess: () => {},
+          // onError: () => {},
+          // onSuccess: () => {},
         }
       );
 
