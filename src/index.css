@@ -45,3 +45,14 @@
 .create-page-bottom-fields-container .ant-form-item{
   width: 100% !important;
 }
+.services-container{
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 20px;
+}
+.tags-in-vIf{
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 10px;
+}

@@ -27,10 +27,13 @@ import { ClientCreate } from "./pages/clients/create";
 import { ClientEditPage } from "./pages/clients/edit";
 
 import "react-phone-input-2/lib/style.css";
-import { IdcardOutlined, TeamOutlined } from "@ant-design/icons";
+import { ContactsOutlined, IdcardOutlined, TeamOutlined } from "@ant-design/icons";
 import { RegisterPage } from "./components/RegisterPage";
 import { InvitationList } from "./pages/clientInvites/list";
 import AcceptInvite from "./pages/accept-invite/accept-invite";
+import VendorList from "./pages/vendors/list";
+import VendorForm from "./pages/vendors/create";
+import { VendorEditPage } from "./pages/vendors/edit";
 
 function App() {
   // useEffect(() => {
@@ -74,6 +77,16 @@ function App() {
                 parent: "Clients",
               },
             },
+            {
+              name: "vendors",
+              list: "/vendors",
+              create: "/vendors/create",
+              edit: "/vendors/edit/:id",
+              meta: {
+                canDelete: true,
+                icon: <ContactsOutlined />,
+              },
+            },
           ]}
           options={{
             syncWithLocation: true,
@@ -111,6 +124,11 @@ function App() {
               </Route>
               <Route path="/invites">
                 <Route index element={<InvitationList />} />
+              </Route>
+              <Route path="/vendors">
+                <Route index element={<VendorList />} />
+                <Route path="create" element={<VendorForm />} />
+                <Route path="edit/:id" element={<VendorEditPage />} />
               </Route>
               <Route path="*" element={<ErrorComponent />} />
             </Route>
