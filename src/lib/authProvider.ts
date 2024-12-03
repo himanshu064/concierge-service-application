@@ -33,16 +33,21 @@ const authProvider: AuthBindings = {
         }
       }
       const authStatus = await getUserAuthStatus({ email });
-      
+
       if (authStatus.user?.is_authorized === "pending") {
+        // Clear session if user is not authorized
+        await supabaseClient.auth.signOut();
+
         notification.error({
-          description: "Please wait for admin approval to gain access to the system. ",
+          description:
+            "Please wait for admin approval to gain access to the system. ",
           message: "Awaiting Admin Approval",
         });
         return {
           success: false,
           error: {
-            message: "Please wait for admin approval to gain access to the system.",
+            message:
+              "Please wait for admin approval to gain access to the system.",
             name: "Awaiting Admin Approval",
           },
         };
@@ -60,8 +65,6 @@ const authProvider: AuthBindings = {
           error,
         };
       }
-
-     
 
       if (data?.user) {
         return {
@@ -175,12 +178,7 @@ const authProvider: AuthBindings = {
 
       return {
         success: true,
-        redirectTo: "/",
-        successNotification: {
-          message:
-            "You will be able log in once the admin approves your account.",
-          description: "Registration Successful",
-        },
+        redirectTo: "/login",
       };
     } catch (error: any) {
       // Handle unexpected errors

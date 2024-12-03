@@ -37,3 +37,11 @@
 .phone-input-container input.form-control{
   width: 100% !important;
 }
+.create-page-bottom-fields-container{
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+.create-page-bottom-fields-container .ant-form-item{
+  width: 100% !important;
+}

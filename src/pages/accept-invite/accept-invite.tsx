@@ -7,6 +7,7 @@ import Loader from "@/components/Loader";
 import { supabaseClient } from "@/lib/supbaseClient";
 import { useCreate, useDelete } from "@refinedev/core";
 import { IClient, IRegister } from "@/types/client";
+import Results from "@/components/ResultPage";
 
 const AcceptInvite: React.FC = () => {
   const [form] = Form.useForm();
@@ -86,6 +87,8 @@ const AcceptInvite: React.FC = () => {
               message: "Verification Successful",
             });
           },
+          onError: () => {
+          },
         }
       );
 
@@ -159,7 +162,7 @@ const AcceptInvite: React.FC = () => {
                     { required: true, message: "Please enter your password" },
                     {
                       min: 6,
-                      message: "Password must be at least 8 characters long",
+                      message: "Password must be at least 6 characters long",
                     },
                   ]}
                 >
@@ -197,7 +200,7 @@ const AcceptInvite: React.FC = () => {
       ) : (
         <>
           <div className="token-expired-page">
-            <h2>Invalid Token or Expired !</h2>
+            <Results status="404" title="404" subTitle="Sorry, the page you visited does not exist." />
           </div>
         </>
       )}
