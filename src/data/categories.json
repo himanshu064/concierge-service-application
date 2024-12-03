@@ -1,0 +1,18 @@
+[
+  {
+    "id": "cat001",
+    "name": "Receipts"
+  },
+  {
+    "id": "cat002",
+    "name": "Documents"
+  },
+  {
+    "id": "cat005",
+    "name": "Medical Record"
+  },
+  {
+    "id": "cat006",
+    "name": "Travel Document"
+  }
+]

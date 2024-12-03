@@ -15,7 +15,7 @@ export interface IClient {
   role: TRoles;
 }
 
-export interface IInvitesRecord{
+export interface IInvitesRecord {
   id?: string;
   name?: string;
   email: string;
@@ -27,8 +27,8 @@ export interface IInvitesRecord{
   token?: string;
   expires_at?: string;
 }
-export interface IRegister{
-  email:string;
+export interface IRegister {
+  email: string;
   password: string;
 }
 export interface INotes {
@@ -51,3 +51,32 @@ export type TAuthorizedStatus = "approved" | "pending";
 export type TGenderType = "male" | "female" | "others";
 
 export type TRegisterType = "self" | "invited";
+
+export type UploadInfo = {
+  file: {
+    uid: string;
+    lastModified: number;
+    lastModifiedDate: string;
+    name: string;
+    size: number;
+    type: string;
+    percent: number;
+    originFileObj: {
+      uid: string;
+    };
+    status: string;
+  };
+  fileList: Array<{
+    uid: string;
+    lastModified: number;
+    lastModifiedDate: string;
+    name: string;
+    size: number;
+    type: string;
+    percent: number;
+    originFileObj: {
+      uid: string;
+    };
+    status: string;
+  }>;
+};
