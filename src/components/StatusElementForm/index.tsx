@@ -29,8 +29,6 @@ export const StatusElementForm: React.FC<StatusElementFormProps> = ({
     }
   };
 
-  console.log(data, "data datadata");
-
   return (
     <div className={styles.container}>
       <div className={styles.icon}>{icon}</div>
